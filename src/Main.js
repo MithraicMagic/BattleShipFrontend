@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import io from 'socket.io-client';
 
-const socket = io('http://bs.cesarpulles.nl/sockets');
+const socket = io('https://bs.cesarpulles.nl/sockets');
 
 export default class Main extends Component {
     componentDidMount() {
