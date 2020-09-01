@@ -5,6 +5,7 @@ const socket = io('https://bs.cesarpulles.nl/sockets');
 
 export default class Main extends Component {
     componentDidMount() {
+        socket.on('connect', () => console.log('suck'));
         socket.emit('chatevent', {username: 'henk', message: 'henk'});
         socket.on('chatevent', (data) => console.log(data));
     }
