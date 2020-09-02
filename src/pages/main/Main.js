@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 
 import './main.scss';
 
-const socket = io(process.env.REACT_APP_URL, {path: '/sockets'});
+const socket = io(process.env.REACT_APP_URL, { path: '/sockets' });
 
 export default class Main extends Component {
     constructor(props) {
@@ -13,22 +13,31 @@ export default class Main extends Component {
     }
 
     componentDidMount() {
-        socket.on('playerCode', (data) => this.setState({lobbyCode: data.data}));
-        socket.on('lobbyId', (data) => this.setState({lobbyId: data.data}));
-        socket.on('otherUsername', (data) => this.setState({otherUsername: data.data}));
+        const lastUID = sessionStorage.getItem('userId');
+        if (lastUID) {
+            socket.emit('lastUid', lastUID);
+        }
+
+        socket.on('playerCode', (data) => this.setState({ lobbyCode: data.data }));
+        socket.on('lobbyId', (data) => this.setState({ lobbyId: data.data }));
+        socket.on('myUsername', (data) => this.setState({ username: data.data }));
+        socket.on('otherUsername', (data) => this.setState({ otherUsername: data.data }));
         socket.on('message', (message) => console.log(message));
+        socket.on('newUid', (data) => sessionStorage.setItem('userId', data.data));
     }
-    
+
     render() {
         if (!this.state.username) {
             return (
                 <div className="main-page">
-                    <h2>Enter your desired username!</h2>
-                    <input type="text" id="username"></input>
-                    <button onClick={() => {
-                        socket.emit('inputUsername', document.getElementById('username').value);
-                        this.setState({username: document.getElementById('username').value});
-                    }}>Submit</button>
+                    <div>
+                        <h2>Enter your desired username!</h2>
+                        <input type="text" id="username"></input>
+                        <button onClick={() => {
+                            socket.emit('inputUsername', document.getElementById('username').value);
+                            this.setState({ username: document.getElementById('username').value });
+                        }}>Submit</button>
+                    </div>
                 </div>
             )
         }
