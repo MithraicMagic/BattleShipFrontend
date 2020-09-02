@@ -13,12 +13,32 @@ export default class Main extends Component {
     }
 
     componentDidMount() {
-        socket.on('lobbyCode', (data) => this.setState({lobbyCode: data.data}));
+        socket.on('playerCode', (data) => this.setState({lobbyCode: data.data}));
         socket.on('lobbyId', (data) => this.setState({lobbyId: data.data}));
+        socket.on('otherUsername', (data) => this.setState({otherUsername: data.data}));
         socket.on('message', (message) => console.log(message));
     }
     
     render() {
+        if (!this.state.username) {
+            return (
+                <div className="main-page">
+                    <h2>Enter your desired username!</h2>
+                    <input type="text" id="username"></input>
+                    <button onClick={() => {
+                        socket.emit('inputUsername', document.getElementById('username').value);
+                        this.setState({username: document.getElementById('username').value});
+                    }}>Submit</button>
+                </div>
+            )
+        }
+        if (this.state.lobbyId) {
+            return (
+                <div className="main-page">
+                    {this.state.otherUsername ? <h1>You are connected to {this.state.otherUsername}!</h1> : <h1>You are connected to someone!</h1>}
+                </div>
+            )
+        }
         return (
             <div className="main-page">
                 {this.state.lobbyCode ? <h1>Your code is: {this.state.lobbyCode}</h1> : <h1>Uhmm.. awkward (waiting for code)</h1>}
