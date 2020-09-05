@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import Socket from '../../socket';
 
 import '../../scss/main.scss';
@@ -7,7 +7,8 @@ import autobind from 'class-autobind';
 const State = {
     ENTER_USERNAME: 0,
     ENTER_CODE: 1,
-    IN_LOBBY: 2
+    IN_LOBBY: 2,
+    OPPONENT_RECONNECTING: 3
 };
 
 export default class Main extends Component {
@@ -46,6 +47,14 @@ export default class Main extends Component {
                 otherUsername: data.opponent
             });
         });
+
+        Socket.on('opponentReconnecting', () => {
+            this.setState({ current: State.OPPONENT_RECONNECTING });
+        });
+
+        Socket.on('opponentReconnected', () => {
+            this.setState({ current: State.IN_LOBBY });
+        });
     }
 
     onSubmitUsername() {
@@ -56,34 +65,41 @@ export default class Main extends Component {
         Socket.emit('tryCode', document.getElementById('code').value);
     }
 
-    render() {
-        if (!this.state.username) {
-            return (
-                <div className="main-page">
+    getCurrentView() {
+        switch(this.state.current) {
+            case State.ENTER_USERNAME:
+                return (
                     <div>
                         <h2>Enter your desired username!</h2>
                         <input type="text" id="username"></input>
                         <button onClick={this.onSubmitUsername}>Submit</button>
                     </div>
-                </div>
-            )
+                );
+            case State.ENTER_CODE:
+                return (
+                    <Fragment>
+                        <h1>Your code is: {this.state.lobbyCode}</h1>
+                        <div>
+                            <h2>Enter a friend's code here!</h2>
+                            <input type="text" id="code"></input>
+                            <button onClick={this.onSumbitCode}>Try Code</button>
+                        </div>
+                    </Fragment>
+                );
+            case State.IN_LOBBY:
+                return <h1>You are connected to {this.state.otherUsername}!</h1>;
+            case State.OPPONENT_RECONNECTING:
+                return <h1>Your opponent is reconnecting...</h1>;
+            default:
+                return <h1>Oops unknown state :(</h1>;
         }
-        if (this.state.lobbyId) {
-            return (
-                <div className="main-page">
-                    {this.state.otherUsername ? <h1>You are connected to {this.state.otherUsername}!</h1> : <h1>You are connected to someone!</h1>}
-                </div>
-            )
-        }
+    }
+
+    render() {
         return (
             <div className="main-page">
-                {this.state.lobbyCode ? <h1>Your code is: {this.state.lobbyCode}</h1> : <h1>Uhmm.. awkward (waiting for code)</h1>}
-                <div>
-                    <h2>Enter a friend's code here!</h2>
-                    <input type="text" id="code"></input>
-                    <button onClick={this.onSumbitCode}>Try Code</button>
-                </div>
+                {this.getCurrentView()}
             </div>
-        )
+        );
     }
 }
