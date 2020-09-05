@@ -15,15 +15,48 @@
 
     .setup-area {
         display: flex;
+        width: 1100px;
+        justify-content: space-evenly;
+        background: lighten($dark-blue-gray, 5);
+
+        > div {
+            margin: 20px;
+        }
+
+        .boats {
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            > div {
+                margin: 10px;
+                box-sizing: border-box;
+                border: 4px solid transparent;
+                transition: .3s border;
+            }
+
+            > .active {
+                border: 4px solid rgb(0, 241, 189);
+            }
+
+            > .moved {
+                position: absolute;
+                margin: 0;
+            }
+
+            > .rotated {
+                transform: rotate(90deg);
+            }
+        }
     }
 
     .cell {
         width: 50px;
         height: 50px;
-        background: $vivid-sky-blue;
         box-sizing: border-box;
         border-radius: 0px;
-        border: 1px solid darken($vivid-sky-blue, 15);
     }
 
     .grid {
@@ -31,5 +64,35 @@
         width: 500px;
         height: 500px;
         flex-wrap: wrap;
+
+        .cell {
+            background: $vivid-sky-blue;
+            border: 1px solid darken($vivid-sky-blue, 15);
+        }
+    }
+
+    .carrier .cell {
+        background: $carrier;
+        border: 1px solid darken($carrier, 15);
+    }
+
+    .battleship .cell {
+        background: $battleship;
+        border: 1px solid darken($battleship, 15);
+    }
+
+    .cruiser .cell {
+        background: $cruiser;
+        border: 1px solid darken($cruiser, 15);
+    }
+
+    .submarine .cell {
+        background: $submarine;
+        border: 1px solid darken($submarine, 15);
+    }
+
+    .minesweeper .cell {
+        background: $minesweeper;
+        border: 1px solid darken($minesweeper, 15);
     }
 }

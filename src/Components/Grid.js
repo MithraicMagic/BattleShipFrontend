@@ -12,7 +12,7 @@ export default class Grid extends Component {
 
     render() {
         return (
-            <div className="grid">
+            <div id={this.props.id} className="grid">
                 {this.getCells(100)}
             </div>
         )

@@ -10,7 +10,7 @@ export const BOATTYPE = {
 }
 
 const BOATDATA = new Map([
-    [BOATTYPE.AIRCRAFT_CARRIER, { size: 5, class: 'aircraft' }],
+    [BOATTYPE.AIRCRAFT_CARRIER, { size: 5, class: 'carrier' }],
     [BOATTYPE.BATTLESHIP, { size: 4, class: 'battleship' }],
     [BOATTYPE.CRUISER, { size: 3, class: 'cruiser' }],
     [BOATTYPE.SUBMARINE, { size: 3, class: 'submarine' }],
@@ -27,13 +27,13 @@ export default class Boat extends Component {
     getCells(amount) {
         const cells = [];
         for (let i = 0; i < amount; i++) {
-            cells.push(<Cell />);
+            cells.push(<Cell key={i}/>);
         }
         return cells;
     }
 
     render() {
         const boatData = BOATDATA.get(this.state.boatType);
-        return <div className={'boat ' + boatData.class}>{this.getCells(boatData.size)}</div>
+        return <div boattype={this.props.boatType} className={'boat ' + boatData.class} onClick={this.props.onClick}>{this.getCells(boatData.size)}</div>
     }
 }
