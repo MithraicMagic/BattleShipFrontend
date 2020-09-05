@@ -96,7 +96,7 @@ export default class Main extends Component {
                         </div>
                         <div>
                             <h2>Enter a friend's code here</h2>
-                            <input type="text" id="code"></input>
+                            <input type="text" id="code" autoComplete="off"></input>
                             <button onClick={this.onSumbitCode}>Try Code</button>
                         </div>
                     </Fragment>
