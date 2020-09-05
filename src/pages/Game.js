@@ -1,17 +1,17 @@
+import React, {Component} from 'react';
 
 const State = {
-    SETUP,
-    YOUR_TURN,
-    OPPONENT_TURN,
-    
+    SETUP: 0,
+    YOUR_TURN: 1,
+    OPPONENT_TURN: 2    
 };
 
-export default class Game {
+export default class Game extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            current: 
+            current: null
         }
     }
 

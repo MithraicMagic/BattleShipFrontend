@@ -6,10 +6,10 @@
 		position: fixed;
 		flex-direction: column;
 		top: 20vh;
-		left: 50vw;
+		left: 50%;
 		transform: translate(-50%, -50%);
 		text-align: center;
-		background-color: #FFFDFD;
+		background-color: darken($dark-blue-gray, 8);
 		width: 100%;
 		max-width: 450px;
 		box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
@@ -17,7 +17,7 @@
 		border-radius: 5px;
 
 		h3 {
-			color: #000;
+			color: $vivid-sky-blue;
 		}
 
 		.top {
@@ -27,7 +27,7 @@
 			width: 100%;
 
 			button {
-				background-color: #D30E0E;
+				background-color: $red-crayola;
 				border: none;
 				right: 5px;
 				top: 5px;
@@ -36,6 +36,11 @@
 				margin: 5px 5px 0 0;
 				color: #FFF;
 				cursor: pointer;
+				transition: .3s background;
+
+				&:hover {
+					background: darken($red-crayola, 8);
+				}
 			}
 		}
 

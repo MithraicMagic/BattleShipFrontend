@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import Socket from '../../socket';
+import Socket from '../socket';
 
-import '../../scss/main.scss';
+import '../scss/main.scss';
 import autobind from 'class-autobind';
+import rensalert from '../rensAlert/rensAlert';
 
 const State = {
     ENTER_USERNAME: 0,
@@ -60,6 +61,15 @@ export default class Main extends Component {
     }
 
     onSubmitUsername() {
+        const name = document.getElementById('username').value.trimLeft().trimRight();
+        if (!name || name.length < 4) {
+            rensalert.popup({title: 'Oopsie!', text: 'Please enter a username that is longer than 4 characters', time: 4000});
+            return;
+        }
+        if (name.length > 20) {
+            rensalert.popup({title: 'Oopsie!', text: 'Please enter a username that is shorter than 20 characters', time: 4000});
+            return;
+        }
         Socket.emit('inputUsername', document.getElementById('username').value);
     }
 
@@ -73,16 +83,19 @@ export default class Main extends Component {
                 return (
                     <div>
                         <h2>Enter your desired username!</h2>
-                        <input type="text" id="username"></input>
+                        <input type="text" id="username" data-lpignore="true"></input>
                         <button onClick={this.onSubmitUsername}>Submit</button>
                     </div>
                 );
             case State.ENTER_CODE:
                 return (
                     <Fragment>
-                        <h1>Your code is: {this.state.lobbyCode}</h1>
                         <div>
-                            <h2>Enter a friend's code here!</h2>
+                            <h1>Hey, {this.state.username}!</h1>
+                            <h2>Your code is: {this.state.lobbyCode}</h2>
+                        </div>
+                        <div>
+                            <h2>Enter a friend's code here</h2>
                             <input type="text" id="code"></input>
                             <button onClick={this.onSumbitCode}>Try Code</button>
                         </div>
