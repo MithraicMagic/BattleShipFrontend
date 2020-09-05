@@ -35,7 +35,8 @@ export default class Main extends Component {
             this.setState({
                 current: State.IN_LOBBY,
                 lobbyId: data.id,
-                otherUsername: data.otherName
+                otherUsername: data.otherName,
+                leader: data.leader
             });
         });
 
@@ -44,7 +45,8 @@ export default class Main extends Component {
                 current: State.IN_LOBBY,
                 lobbyId: data.lobbyId,
                 username: data.me,
-                otherUsername: data.opponent
+                otherUsername: data.opponent,
+                leader: data.leader
             });
         });
 
@@ -87,7 +89,13 @@ export default class Main extends Component {
                     </Fragment>
                 );
             case State.IN_LOBBY:
-                return <h1>You are connected to {this.state.otherUsername}!</h1>;
+                return (
+                    <div className="lobby">
+                        <h1>You are connected to {this.state.otherUsername}!</h1>
+
+                        {this.state.leader ? <button>Start Game</button> : ''}
+                    </div>
+                );
             case State.OPPONENT_RECONNECTING:
                 return <h1>Your opponent is reconnecting...</h1>;
             default:
