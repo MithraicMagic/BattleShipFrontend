@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react'
-import Socket from '../socket';
+import socket from '../socket';
 
 import '../scss/main.scss';
 import autobind from 'class-autobind';
 import rensalert from '../rensAlert/rensAlert';
+import { withRouter } from 'react-router-dom';
 
 const State = {
     ENTER_USERNAME: 0,
@@ -12,7 +13,7 @@ const State = {
     OPPONENT_RECONNECTING: 3
 };
 
-export default class Main extends Component {
+class Main extends Component {
     constructor(props) {
         super(props);
         autobind(this);
@@ -23,16 +24,16 @@ export default class Main extends Component {
     }
 
     componentDidMount() {
-        Socket.on('nameAccepted', (data) => {
-            Socket.setUid(data.uid);
+        socket.on('nameAccepted', (data) => {
+            socket.setUid(data.uid);
             this.setState({
                 current: State.ENTER_CODE,
-                lobbyCode: data.code,
+                playerCode: data.code,
                 username: data.name
             });
         });
 
-        Socket.on('lobbyJoined', (data) => {
+        socket.on('lobbyJoined', (data) => {
             this.setState({
                 current: State.IN_LOBBY,
                 lobbyId: data.id,
@@ -41,7 +42,7 @@ export default class Main extends Component {
             });
         });
 
-        Socket.on('reconnect', (data) => {
+        socket.on('reconnect', (data) => {
             this.setState({
                 current: State.IN_LOBBY,
                 lobbyId: data.lobbyId,
@@ -51,40 +52,55 @@ export default class Main extends Component {
             });
         });
 
-        Socket.on('opponentReconnecting', () => {
+        socket.on('opponentReconnecting', () => {
             this.setState({ current: State.OPPONENT_RECONNECTING });
         });
 
-        Socket.on('opponentReconnected', () => {
+        socket.on('opponentLeft', () => {
+            this.setState({ current: State.ENTER_CODE });
+            rensalert.popup({ title: "Oh no!", text: "Your opponent has disconnected 😭" });
+        });
+
+        socket.on('opponentReconnected', () => {
             this.setState({ current: State.IN_LOBBY });
         });
+
+        socket.on('gameStarted', () => this.props.history.push({pathname: '/game', state: this.state}));
     }
 
-    onSubmitUsername() {
+    componentWillUnmount() {
+        socket.removeListeners();
+    }
+
+    submitUsername() {
         const name = document.getElementById('username').value.trimLeft().trimRight();
         if (!name || name.length < 4) {
-            rensalert.popup({title: 'Oopsie!', text: 'Please enter a username that is longer than 4 characters', time: 4000});
+            rensalert.popup({ title: 'Oopsie!', text: 'Please enter a username that is longer than 4 characters', time: 4000 });
             return;
         }
         if (name.length > 20) {
-            rensalert.popup({title: 'Oopsie!', text: 'Please enter a username that is shorter than 20 characters', time: 4000});
+            rensalert.popup({ title: 'Oopsie!', text: 'Please enter a username that is shorter than 20 characters', time: 4000 });
             return;
         }
-        Socket.emit('inputUsername', document.getElementById('username').value);
+        socket.emit('inputUsername', document.getElementById('username').value);
     }
 
-    onSumbitCode() {
-        Socket.emit('tryCode', document.getElementById('code').value);
+    tryCode() {
+        socket.emit('tryCode', document.getElementById('code').value);
+    }
+
+    emitStart() {
+        socket.emit('startGame', this.state.lobbyId);
     }
 
     getCurrentView() {
-        switch(this.state.current) {
+        switch (this.state.current) {
             case State.ENTER_USERNAME:
                 return (
                     <div>
                         <h2>Enter your desired username!</h2>
                         <input type="text" id="username" autoComplete="off" data-lpignore="true"></input>
-                        <button onClick={this.onSubmitUsername}>Submit</button>
+                        <button onClick={this.submitUsername}>Submit</button>
                     </div>
                 );
             case State.ENTER_CODE:
@@ -92,12 +108,12 @@ export default class Main extends Component {
                     <Fragment>
                         <div>
                             <h1>Hey, {this.state.username}!</h1>
-                            <h2>Your code is: {this.state.lobbyCode}</h2>
+                            <h2>Your code is: {this.state.playerCode}</h2>
                         </div>
                         <div>
                             <h2>Enter a friend's code here</h2>
                             <input type="text" id="code" autoComplete="off"></input>
-                            <button onClick={this.onSumbitCode}>Try Code</button>
+                            <button onClick={this.tryCode}>Try Code</button>
                         </div>
                     </Fragment>
                 );
@@ -106,13 +122,13 @@ export default class Main extends Component {
                     <div className="lobby">
                         <h1>You are connected to {this.state.otherUsername}!</h1>
 
-                        {this.state.leader ? <button>Start Game</button> : ''}
+                        {this.state.leader ? <button onClick={this.emitStart}>Start Game</button> : null}
                     </div>
                 );
             case State.OPPONENT_RECONNECTING:
-                return <h1>Your opponent is reconnecting...</h1>;
+                return <h1>Your opponent is reconnecting... <span role="img" aria-label="ANXIOUS!">😰</span></h1>;
             default:
-                return <h1>Oops unknown state :(</h1>;
+                return <h1>Oopsie whoopsie, unknown state <span role="img" aria-label="SAD!">😔</span></h1>;
         }
     }
 
@@ -124,3 +140,5 @@ export default class Main extends Component {
         );
     }
 }
+
+export default withRouter(Main);

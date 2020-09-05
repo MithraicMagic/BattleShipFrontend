@@ -1,4 +1,3 @@
-
 import io from 'socket.io-client';
 import RensAlert from './rensAlert/rensAlert';
 
@@ -17,7 +16,7 @@ class Socket {
         this.on('message');
         this.on('errorEvent', (data) => {
             RensAlert.popup({
-                title: 'Oops',
+                title: 'Oopsie!',
                 text: data.reason,
                 time: 5000
             });
@@ -45,6 +44,10 @@ class Socket {
             }
             if (func) func(...data);
         });
+    }
+
+    removeListeners() {
+        this.socket.removeAllListeners();
     }
 }
 

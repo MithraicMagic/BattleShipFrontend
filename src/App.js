@@ -5,6 +5,7 @@ import { RensAlertContainer } from './rensAlert/rensAlert';
  
 import './scss/general.scss';
 import Main from './pages/Main';
+import Game from './pages/Game';
 
 export default class App extends Component {
   render() {
@@ -13,6 +14,7 @@ export default class App extends Component {
       <RensAlertContainer/>
       <Router>
         <Switch>
+          <Route path={'/game'} component={Game} />
           <Route path={'/'} component={Main} />
         </Switch>
       </Router>

@@ -3,12 +3,13 @@
 
 * {
     border-radius: 5px;
+    font-family: "Roboto", Helvetica, sans-serif;
     outline: none;
     padding: 0;
     margin: 0;
 }
 
-html, body, #root{
+html, body, #root {
     height: 100%;
 }
 
@@ -16,7 +17,6 @@ body {
     background: $dark-blue-gray;
     font-size: 20px;
     color: white;
-    font-family: "Roboto", Helvetica, sans-serif;
 
     button {
         cursor: pointer;
