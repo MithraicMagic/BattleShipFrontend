@@ -1,0 +1,77 @@
+@import '../scss/colors.scss';
+
+#rensAlert {
+	.popup, .confirm, .accept, .input {
+		display: flex;
+		position: fixed;
+		flex-direction: column;
+		top: 20vh;
+		left: 50vw;
+		transform: translate(-50%, -50%);
+		text-align: center;
+		background-color: #FFFDFD;
+		width: 100%;
+		max-width: 450px;
+		box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+		z-index: 10000;
+		border-radius: 5px;
+
+		h3 {
+			color: #000;
+		}
+
+		.top {
+			position: absolute;
+			display: flex;
+			justify-content: flex-end;
+			width: 100%;
+
+			button {
+				background-color: #D30E0E;
+				border: none;
+				right: 5px;
+				top: 5px;
+				width: 25px;
+				height: 25px;
+				margin: 5px 5px 0 0;
+				color: #FFF;
+				cursor: pointer;
+			}
+		}
+
+		.content {
+			margin: 3% auto 5% auto; 
+			width: 90%;
+
+			input {
+				margin-top: 5%;
+				padding: 4px 0;
+			}
+
+			p { 
+				margin: 4%;
+				margin-bottom: 2%;
+				width: 92%;
+				font-size: 20px;
+			}
+		}
+
+		.buttons {
+			button {
+				border-radius: 5px;
+				border: none;
+				color: #FFF;
+				padding: 0.5vh 1vw;
+				margin: 0.2vh 0.2vw 1vh 0.2vw;
+			}
+
+			.acceptButton {
+				background-color: #4A8540;
+			}
+
+			.declineButton {
+				background-color: #D30E0E;
+			}
+		}
+	}
+}

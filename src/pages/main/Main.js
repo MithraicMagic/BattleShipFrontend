@@ -1,29 +1,59 @@
 import React, { Component } from 'react'
-import io from 'socket.io-client';
+import Socket from '../../socket';
 
-import './main.scss';
+import '../../scss/main.scss';
+import autobind from 'class-autobind';
 
-const socket = io(process.env.REACT_APP_URL, { path: '/sockets' });
+const State = {
+    ENTER_USERNAME: 0,
+    ENTER_CODE: 1,
+    IN_LOBBY: 2
+};
 
 export default class Main extends Component {
     constructor(props) {
-        super();
+        super(props);
+        autobind(this);
 
-        this.state = {};
+        this.state = {
+            current: State.ENTER_USERNAME,
+        };
     }
 
     componentDidMount() {
-        const lastUID = sessionStorage.getItem('userId');
-        if (lastUID) {
-            socket.emit('lastUid', lastUID);
-        }
+        Socket.on('nameAccepted', (data) => {
+            Socket.setUid(data.uid);
+            this.setState({
+                current: State.ENTER_CODE,
+                lobbyCode: data.code,
+                username: data.name
+            });
+        });
 
-        socket.on('playerCode', (data) => this.setState({ lobbyCode: data.data }));
-        socket.on('lobbyId', (data) => this.setState({ lobbyId: data.data }));
-        socket.on('myUsername', (data) => this.setState({ username: data.data }));
-        socket.on('otherUsername', (data) => this.setState({ otherUsername: data.data }));
-        socket.on('message', (message) => console.log(message));
-        socket.on('newUid', (data) => sessionStorage.setItem('userId', data.data));
+        Socket.on('lobbyJoined', (data) => {
+            this.setState({
+                current: State.IN_LOBBY,
+                lobbyId: data.id,
+                otherUsername: data.otherName
+            });
+        });
+
+        Socket.on('reconnect', (data) => {
+            this.setState({
+                current: State.IN_LOBBY,
+                lobbyId: data.lobbyId,
+                username: data.me,
+                otherUsername: data.opponent
+            });
+        });
+    }
+
+    onSubmitUsername() {
+        Socket.emit('inputUsername', document.getElementById('username').value);
+    }
+
+    onSumbitCode() {
+        Socket.emit('tryCode', document.getElementById('code').value);
     }
 
     render() {
@@ -33,10 +63,7 @@ export default class Main extends Component {
                     <div>
                         <h2>Enter your desired username!</h2>
                         <input type="text" id="username"></input>
-                        <button onClick={() => {
-                            socket.emit('inputUsername', document.getElementById('username').value);
-                            this.setState({ username: document.getElementById('username').value });
-                        }}>Submit</button>
+                        <button onClick={this.onSubmitUsername}>Submit</button>
                     </div>
                 </div>
             )
@@ -54,7 +81,7 @@ export default class Main extends Component {
                 <div>
                     <h2>Enter a friend's code here!</h2>
                     <input type="text" id="code"></input>
-                    <button onClick={() => socket.emit('tryCode', document.getElementById('code').value)}>Try Code</button>
+                    <button onClick={this.onSumbitCode}>Try Code</button>
                 </div>
             </div>
         )
