@@ -83,7 +83,7 @@ export default class Main extends Component {
                 return (
                     <div>
                         <h2>Enter your desired username!</h2>
-                        <input type="text" id="username" data-lpignore="true"></input>
+                        <input type="text" id="username" autoComplete="off" data-lpignore="true"></input>
                         <button onClick={this.onSubmitUsername}>Submit</button>
                     </div>
                 );
