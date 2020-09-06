@@ -13,7 +13,8 @@ class Game extends Component {
 
         this.state = {
             setBoats: [],
-            currentBoat: null
+            currentBoat: null,
+            lastBoat: null
         };
 
         autobind(this);
@@ -35,11 +36,31 @@ class Game extends Component {
         socket.on('opponentLeft', () => {
             rensalert.accept({ 
                 title: "Oh no!", text: "Your opponent has disconnected 😭", accept: 'Okay :(', 
-                onAccept: () => this.props.history.push({ pathname: '/', state: this.state })});
+                onAccept: () => this.props.history.push({ pathname: '/', state: this.state })
+            });
         });
 
         socket.on('lobbyLeft', () => {
             this.props.history.push('/');
+        });
+
+        socket.on('errorEvent', () => {
+            if (this.state.pendingBoat) {
+                this.state.pendingBoat.element.classList.remove('active', 'placed');
+
+                //Remove boat from the grid
+                document.querySelectorAll('.grid-cell').forEach(cell => {
+                    if (cell.classList.contains(BOATDATA.get(this.state.pendingBoat.type).class)) {
+                        cell.classList.remove(BOATDATA.get(this.state.pendingBoat.type).class, 'active');
+                        if (cell.getAttribute('boattype') === BOATDATA.get(this.state.pendingBoat.type).class) cell.removeAttribute('boattype');
+                    }
+                });
+            }
+            this.setState({pendingBoat: null});
+        });
+
+        socket.on('placeShipAccepted', () => {
+            this.setState({setBoats: [...this.state.setBoats, this.state.pendingBoat], pendingBoat: null});
         });
 
         document.addEventListener('mousemove', this.updateMousePos);
@@ -119,6 +140,7 @@ class Game extends Component {
     }
 
     onMouseDown(m) {
+        if (this.state.pendingBoat) return;
         if (this.state.currentBoat) {
             const el = this.state.currentBoat.element;
 
@@ -151,7 +173,7 @@ class Game extends Component {
                 ship: BOATDATA.get(this.state.currentBoat.type).class,
                 horizontal: this.state.currentBoat.orientation === 0
             });
-            this.setState({ currentBoat: null, setBoats: [...this.state.setBoats, this.state.currentBoat] });
+            this.setState({ currentBoat: null, pendingBoat: this.state.currentBoat });
         } else {
             //If the clicked element is a boat that is on the grid
             if (m.target.parentElement.classList.contains('grid') && m.target.getAttribute('boattype')) {
