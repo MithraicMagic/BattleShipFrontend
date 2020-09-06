@@ -48,49 +48,52 @@ export default class Game extends Component {
     }
 
     updateMousePos(m) {
-        const grid = document.getElementById('grid');
-        if (!grid) return
+        if (this.state.currentBoat) {
+            const gridPos = document.getElementById('grid').getBoundingClientRect();
+            if (m.pageY > gridPos.top && m.pageX > gridPos.left && m.pageY < gridPos.top + gridPos.height && m.pageX < gridPos.left + gridPos.width) {
+                const yCell = Math.floor((m.pageY - gridPos.top)/50);
+                const xCell = Math.floor((m.pageX - gridPos.left)/50);
 
-        const gridPos = grid.getBoundingClientRect();
-        if (this.state.currentBoat && m.pageY > gridPos.top && m.pageX > gridPos.left && m.pageY < gridPos.top + gridPos.height && m.pageX < gridPos.left + gridPos.width) {
-            const el = this.state.currentBoat.element;
-            let yTile = BOATDATA.get(this.state.currentBoat.type).size % 2 === 1 ? Math.round((m.pageY - el.offsetHeight/2 - gridPos.top - 25)/50) : Math.round((m.pageY - el.offsetHeight/2 - gridPos.top)/50);
-            let xTile = Math.round((m.pageX - el.offsetWidth/2 - gridPos.left)/50);
+                const boat = this.state.currentBoat;
+                const boatData = BOATDATA.get(this.state.currentBoat.type);
 
-            console.log(xTile,yTile);
+                const startX = boat.orientation === 1 ? xCell : xCell - Math.floor((boatData.size-.01)/2);
+                const startY = boat.orientation === 0 ? yCell : yCell - Math.floor((boatData.size-.01)/2);
 
-            el.style.top = gridPos.top + (50 * yTile) - 4 + 'px';
-            el.style.left = gridPos.left + (50 * xTile) - 4 + 'px';
+                document.querySelectorAll('.grid-cell').forEach(cell => {
+                    cell.classList.remove(boatData.class);
+                });
+
+                for (let i = 0; i < boatData.size; i++) {
+                    console.log('x:' + (boat.orientation === 1 ? startX : startX + i) + '-y:' + (boat.orientation === 0 ? startY : startY + i));
+                    const cell = document.getElementById('x:' + (boat.orientation === 1 ? startX : startX + i) + '-y:' + (boat.orientation === 0 ? startY : startY + i));
+                    if (cell) cell.classList.add(boatData.class);
+                }
+            }
         }
     }
 
-    onMouseDown(m, boatType = 0) {
+    onMouseDown(m) {
         if (this.state.currentBoat) {
             const el = this.state.currentBoat.element;
 
             if (m.button === 2) {
                 el.classList.remove('active');
-                el.classList.remove('moved');
                 this.setState({currentBoat: null});
             }
 
             el.classList.remove('active');
-
             this.setState({currentBoat: null});
         } else {
-            if (!m.target.classList.contains('cell') || !m.target.parentElement.classList.contains('boat')) {
-                return;
-            }
-            this.setState({ currentBoat: { element: m.target.parentElement, type: m.target.parentElement.getAttribute('boattype'), orientation: 0 } });
-            console.log(m.target.parentElement.getAttribute('boattype'), BOATDATA.get(this.state.currentBoat.type));
+            if (!m.target.classList.contains('cell') || !m.target.parentElement.classList.contains('boat')) return;
+            this.setState({ currentBoat: { element: m.target.parentElement, type: Number(m.target.parentElement.getAttribute('boattype')), orientation: 1 } });
             m.target.parentElement.classList.add('active');
-            m.target.parentElement.classList.add('moved');
         }
     }
 
     rotateShip(k) {
         if (k.key === 'r' && this.state.currentBoat) {
-            this.state.currentBoat.element.classList.toggle('rotated');
+            this.setState({currentBoat: {...this.state.currentBoat, orientation: this.state.currentBoat.orientation === 0 ? 1 : 0}});
         }
     }
 
