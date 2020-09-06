@@ -102,8 +102,10 @@ class Game extends Component {
                 //Remove boat from grid
                 const boatData = BOATDATA.get(this.state.currentBoat.type);
                 document.querySelectorAll('.grid-cell').forEach(cell => {
-                    cell.classList.remove(boatData.class);
-                    if (cell.getAttribute('boattype') === boatData.class) cell.removeAttribute('boattype');
+                    if (cell.classList.contains(boatData.class)) {
+                        cell.classList.remove(boatData.class, 'active');
+                        if (cell.getAttribute('boattype') === boatData.class) cell.removeAttribute('boattype');
+                    }
                 });
             }
         }
@@ -119,8 +121,10 @@ class Game extends Component {
 
                 //Remove boat from the grid
                 document.querySelectorAll('.grid-cell').forEach(cell => {
-                    cell.classList.remove(BOATDATA.get(this.state.currentBoat.type).class);
-                    if (cell.getAttribute('boattype') === BOATDATA.get(this.state.currentBoat.type).class) cell.removeAttribute('boattype');
+                    if (cell.classList.contains(BOATDATA.get(this.state.currentBoat.type).class)) {
+                        cell.classList.remove(BOATDATA.get(this.state.currentBoat.type).class, 'active');
+                        if (cell.getAttribute('boattype') === BOATDATA.get(this.state.currentBoat.type).class) cell.removeAttribute('boattype');
+                    }
                 });
 
                 this.setState({ currentBoat: null });
@@ -148,7 +152,7 @@ class Game extends Component {
             }
 
             //If one of the boats in the boat area is clicked
-            if (m.target.classList.contains('cell') || m.target.parentElement.classList.contains('boat') || !m.target.parentElement.classList.contains('placed')) {
+            if (m.target.classList.contains('cell') && m.target.parentElement.classList.contains('boat') && !m.target.parentElement.classList.contains('placed')) {
                 //Get information from boat element that was clicked
                 this.setState({ currentBoat: { element: m.target.parentElement, type: Number(m.target.parentElement.getAttribute('boattype')), orientation: 1, onBoard: false } });
                 m.target.parentElement.classList.add('active');
@@ -184,6 +188,7 @@ class Game extends Component {
             case "Setup":
                 return (
                     <Fragment>
+                        <button onClick={this.submitLeave}>Leave</button>
                         <div className="info">
                             <h1>Setup Fase</h1>
                             <h2>Put all of your boats on the grid and press the button</h2>
@@ -201,10 +206,8 @@ class Game extends Component {
                                 <Boat boatType={BOATTYPE.MINESWEEPER}></Boat>
                             </div>
                         </div>
-
                         <div className="bottom">
                             <button onClick={this.submitSetup}>Submit</button>
-                            <button onClick={this.submitLeave}>Leave</button>
                         </div>
                     </Fragment>
                 )
