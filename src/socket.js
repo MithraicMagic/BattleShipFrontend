@@ -5,12 +5,15 @@ class Socket {
     constructor() {
         this.socket = io(process.env.REACT_APP_URL, { path: '/sockets' });
         this.uid = sessionStorage.getItem('userId');
+        
+        this.state = "EnterName";
+        this.onStateSwitch = null;
 
+        this.listeners = [];
         this.init();
     }
 
     init() {
-        if (this.uid) this.emit('lastUid', this.uid);
         this.on('newUid', (data) => sessionStorage.setItem('userId', data.data));
 
         this.on('message');
@@ -21,6 +24,13 @@ class Socket {
                 time: 5000
             });
         });
+
+        this.on('playerState', (state) => {
+            this.state = state;
+            if (this.onStateSwitch) this.onStateSwitch();
+        });
+
+        this.emit('lastUid', this.uid);
     }
 
     setUid(uid) {
@@ -37,6 +47,8 @@ class Socket {
     }
 
     on(msg, func) {
+        this.listeners.push({ event: msg, func });
+
         this.socket.on(msg, (...data) => {
             if (process.env.REACT_APP_DEBUG === 'true') {
                 const lg = `[SOCKET] Receiving '${msg}'` + (process.env.REACT_APP_LOG_PAYLOAD === 'true' ? ` with payload: ${JSON.stringify(data)}` : '');
@@ -47,7 +59,10 @@ class Socket {
     }
 
     removeListeners() {
-        this.socket.removeAllListeners();
+        this.listeners.forEach((l) => {
+            this.socket.removeListener(l.event, l.func);
+        });
+        this.listeners = [];
     }
 }
 

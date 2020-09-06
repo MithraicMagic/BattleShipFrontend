@@ -6,28 +6,20 @@ import autobind from 'class-autobind';
 import rensalert from '../rensAlert/rensAlert';
 import { withRouter } from 'react-router-dom';
 
-const State = {
-    ENTER_USERNAME: 0,
-    ENTER_CODE: 1,
-    IN_LOBBY: 2,
-    OPPONENT_RECONNECTING: 3
-};
-
 class Main extends Component {
     constructor(props) {
         super(props);
         autobind(this);
 
-        this.state = {
-            current: State.ENTER_USERNAME,
-        };
+        this.state = {};
     }
 
     componentDidMount() {
+        socket.onStateSwitch = () => { this.forceUpdate(); }
+
         socket.on('nameAccepted', (data) => {
             socket.setUid(data.uid);
             this.setState({
-                current: State.ENTER_CODE,
                 playerCode: data.code,
                 username: data.name
             });
@@ -35,7 +27,6 @@ class Main extends Component {
 
         socket.on('lobbyJoined', (data) => {
             this.setState({
-                current: State.IN_LOBBY,
                 lobbyId: data.id,
                 otherUsername: data.otherName,
                 leader: data.leader
@@ -44,7 +35,13 @@ class Main extends Component {
 
         socket.on('reconnect', (data) => {
             this.setState({
-                current: State.IN_LOBBY,
+                playerCode: data.code,
+                username: data.me
+            });
+        });
+
+        socket.on('reconnectLobby', (data) => {
+            this.setState({
                 lobbyId: data.lobbyId,
                 username: data.me,
                 otherUsername: data.opponent,
@@ -52,20 +49,11 @@ class Main extends Component {
             });
         });
 
-        socket.on('opponentReconnecting', () => {
-            this.setState({ current: State.OPPONENT_RECONNECTING });
-        });
-
         socket.on('opponentLeft', () => {
-            this.setState({ current: State.ENTER_CODE });
             rensalert.popup({ title: "Oh no!", text: "Your opponent has disconnected 😭" });
         });
 
-        socket.on('opponentReconnected', () => {
-            this.setState({ current: State.IN_LOBBY });
-        });
-
-        socket.on('gameStarted', () => this.props.history.push({pathname: '/game', state: this.state}));
+        socket.on('gameStarted', () => this.props.history.push({ pathname: '/game', state: this.state }));
     }
 
     componentWillUnmount() {
@@ -94,8 +82,8 @@ class Main extends Component {
     }
 
     getCurrentView() {
-        switch (this.state.current) {
-            case State.ENTER_USERNAME:
+        switch (socket.state) {
+            case "EnterName":
                 return (
                     <div>
                         <h2>Enter your desired username!</h2>
@@ -103,7 +91,7 @@ class Main extends Component {
                         <button onClick={this.submitUsername}>Submit</button>
                     </div>
                 );
-            case State.ENTER_CODE:
+            case "Available":
                 return (
                     <Fragment>
                         <div>
@@ -117,7 +105,7 @@ class Main extends Component {
                         </div>
                     </Fragment>
                 );
-            case State.IN_LOBBY:
+            case "Lobby":
                 return (
                     <div className="lobby">
                         <h1>You are connected to {this.state.otherUsername}!</h1>
@@ -125,7 +113,7 @@ class Main extends Component {
                         {this.state.leader ? <button onClick={this.emitStart}>Start Game</button> : null}
                     </div>
                 );
-            case State.OPPONENT_RECONNECTING:
+            case "OpponentReconnecting":
                 return <h1>Your opponent is reconnecting... <span role="img" aria-label="ANXIOUS!">😰</span></h1>;
             default:
                 return <h1>Oopsie whoopsie, unknown state <span role="img" aria-label="SAD!">😔</span></h1>;

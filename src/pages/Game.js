@@ -29,9 +29,10 @@ export default class Game extends Component {
     }
 
     componentDidMount() {
+        socket.onStateSwitch = () => { this.forceUpdate(); }
+
         socket.on('reconnect', (data) => {
             this.setState({
-                current: data.gameState,
                 lobbyId: data.lobbyId,
                 username: data.me,
                 otherUsername: data.opponent,
@@ -114,7 +115,10 @@ export default class Game extends Component {
                             <h1>Setup Phase</h1>
                             <h2>Put all of your boats on the grid and press the button</h2>
                         </div>
-                        <div className="setup-area">
+                        <div className="setup-area" onContextMenu={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}>
                             <Grid id="grid"/>
                             <div className="boats">
                                 <Boat boatType={BOATTYPE.AIRCRAFT_CARRIER}></Boat>

@@ -37,6 +37,7 @@
 				color: #FFF;
 				cursor: pointer;
 				transition: .3s background;
+				padding: 0px;
 
 				&:hover {
 					background: darken($red-crayola, 8);
