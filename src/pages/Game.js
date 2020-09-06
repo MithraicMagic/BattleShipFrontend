@@ -53,6 +53,15 @@ class Game extends Component {
         document.removeEventListener('keydown', this.rotateShip);
     }
 
+    calculateTile(m) {
+        const gridPos = document.getElementById('grid').getBoundingClientRect();
+
+        const yCell = Math.floor((m.pageY - gridPos.top) / 50);
+        const xCell = Math.floor((m.pageX - gridPos.left) / 50);
+
+        return {xCell, yCell};
+    }
+
     updateMousePos(m) {
         if (this.state.currentBoat) {
             const gridPos = document.getElementById('grid').getBoundingClientRect();
@@ -65,15 +74,13 @@ class Game extends Component {
                     this.setState({ currentBoat: { ...this.state.currentBoat, onBoard: true } });
                 }
 
-                //Calculate on which tile the mouse is currently hovering
-                const yCell = Math.floor((m.pageY - gridPos.top) / 50);
-                const xCell = Math.floor((m.pageX - gridPos.left) / 50);
-
                 const boat = this.state.currentBoat;
                 const boatData = BOATDATA.get(boat.type);
 
-                const startX = boat.orientation === 1 ? xCell : xCell - Math.floor((boatData.size - .01) / 2);
-                const startY = boat.orientation === 0 ? yCell : yCell - Math.floor((boatData.size - .01) / 2);
+                //Calculate on which tile the mouse is currently hovering
+                const tile = this.calculateTile(m);
+                const startX = boat.orientation === 1 ? tile.xCell : tile.xCell - Math.floor((boatData.size - .01) / 2);
+                const startY = boat.orientation === 0 ? tile.yCell : tile.yCell - Math.floor((boatData.size - .01) / 2);
 
                 //Remove boat from other tiles on the grid
                 document.querySelectorAll('.grid-cell').forEach(cell => {
@@ -135,6 +142,15 @@ class Game extends Component {
             el.classList.add('placed');
 
             //Add placed boat to setBoats
+            const tile = this.calculateTile(m);
+            socket.emit('placeShip', {
+                lobbyId: this.state.lobbyId,
+                i: tile.xCell,
+                j: tile.yCell,
+                uid: socket.uid,
+                ship: BOATDATA.get(this.state.currentBoat.type).class,
+                horizontal: this.state.currentBoat.orientation === 0
+            });
             this.setState({ currentBoat: null, setBoats: [...this.state.setBoats, this.state.currentBoat] });
         } else {
             //If the clicked element is a boat that is on the grid
