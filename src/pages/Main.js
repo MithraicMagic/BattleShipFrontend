@@ -17,8 +17,23 @@ class Main extends Component {
     componentDidMount() {
         socket.onStateSwitch = () => { this.forceUpdate(); }
 
+        socket.emit('getNameData', socket.uid);
+        socket.on('nameData', (data) => {
+            this.setState({
+                playerCode: data.code,
+                username: data.me
+            });
+        });
+
         socket.on('nameAccepted', (data) => {
             socket.setUid(data.uid);
+
+            const joinCode = new URL(window.location.href).searchParams.get('code');
+            if (joinCode != null) {
+                document.getElementById('code').value = joinCode;
+                this.tryCode();
+            }
+
             this.setState({
                 playerCode: data.code,
                 username: data.name
@@ -33,13 +48,6 @@ class Main extends Component {
             });
         });
 
-        socket.on('reconnect', (data) => {
-            this.setState({
-                playerCode: data.code,
-                username: data.me
-            });
-        });
-
         socket.on('reconnectLobby', (data) => {
             this.setState({
                 lobbyId: data.lobbyId,
@@ -50,10 +58,10 @@ class Main extends Component {
         });
 
         socket.on('opponentLeft', () => {
-            rensalert.popup({ title: "Oh no!", text: "Your opponent has disconnected 😭" });
+            rensalert.popup({ title: "Oh no!", text: "Your opponent has disconnected 😭", time: 5000 });
         });
 
-        socket.on('gameStarted', () => this.props.history.push({ pathname: '/game', state: this.state }));
+        socket.on('gameStarted', () => this.props.history.push('/game'));
     }
 
     componentWillUnmount() {
@@ -81,6 +89,17 @@ class Main extends Component {
         socket.emit('startGame', this.state.lobbyId);
     }
 
+    async onCodeClick() {
+        await navigator.clipboard.writeText(
+            `${process.env.REACT_APP_BASE_URL}/?code=${this.state.playerCode}`
+        );
+
+        document.querySelector('.copyPopup').classList.add('visible');
+        setTimeout(() => {
+            document.querySelector('.copyPopup').classList.remove('visible');
+        }, 2000);
+    }
+
     getCurrentView() {
         switch (socket.state) {
             case "EnterName":
@@ -94,9 +113,12 @@ class Main extends Component {
             case "Available":
                 return (
                     <Fragment>
-                        <div>
+                        <div className="top">
                             <h1>Hey, {this.state.username}!</h1>
-                            <h2>Your code is: {this.state.playerCode}</h2>
+                            <h2>
+                                Your code is: <span className="code" onClick={this.onCodeClick}>{this.state.playerCode}</span>
+                                <div className="copyPopup"><p>Code copied to clipboard</p></div>
+                            </h2>
                         </div>
                         <div>
                             <h2>Enter a friend's code here</h2>

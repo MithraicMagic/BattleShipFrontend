@@ -5,14 +5,13 @@ import '../scss/game.scss';
 import Boat, { BOATTYPE, BOATDATA } from '../Components/Boat';
 import Grid from '../Components/Grid';
 import autobind from 'class-autobind';
+import { withRouter } from 'react-router-dom';
 
-export default class Game extends Component {
+class Game extends Component {
     constructor(props) {
         super(props);
 
-        const mainState = this.props.location.state;
         this.state = {
-            ...mainState,
             setBoats: [],
             currentBoat: null
         };
@@ -23,7 +22,8 @@ export default class Game extends Component {
     componentDidMount() {
         socket.onStateSwitch = () => { this.forceUpdate(); }
 
-        socket.on('reconnect', (data) => {
+        socket.emit('getGameData', socket.uid);
+        socket.on('gameData', (data) => {
             this.setState({
                 lobbyId: data.lobbyId,
                 username: data.me,
@@ -33,7 +33,13 @@ export default class Game extends Component {
         });
 
         socket.on('opponentLeft', () => {
-            rensalert.accept({ title: "Oh no!", text: "Your opponent has disconnected 😭", accept: 'Okay :(', onAccept: () => this.props.history.push('/') });
+            rensalert.accept({ 
+                title: "Oh no!", text: "Your opponent has disconnected 😭", accept: 'Okay :(', 
+                onAccept: () => this.props.history.push({ pathname: '/', state: this.state })});
+        });
+
+        socket.on('lobbyLeft', () => {
+            this.props.history.push('/');
         });
 
         document.addEventListener('mousemove', this.updateMousePos);
@@ -161,6 +167,18 @@ export default class Game extends Component {
 
     }
 
+    submitLeave() {
+        rensalert.confirm({
+            title: "Are you sure",
+            text: "That you want to leave the lobby?",
+            accept: "Yes",
+            decline: "No",
+            onAccept: () => {
+                socket.emit('leaveLobby', { uid: socket.uid, lobbyId: this.state.lobbyId });
+            }
+        })
+    }
+
     getCurrentView() {
         switch (socket.state) {
             case "Setup":
@@ -183,7 +201,11 @@ export default class Game extends Component {
                                 <Boat boatType={BOATTYPE.MINESWEEPER}></Boat>
                             </div>
                         </div>
-                        <button onClick={this.submitSetup}>Submit</button>
+
+                        <div className="bottom">
+                            <button onClick={this.submitSetup}>Submit</button>
+                            <button onClick={this.submitLeave}>Leave</button>
+                        </div>
                     </Fragment>
                 )
             case "OpponentReconnecting":
@@ -201,3 +223,5 @@ export default class Game extends Component {
         )
     }
 }
+
+export default withRouter(Game);
