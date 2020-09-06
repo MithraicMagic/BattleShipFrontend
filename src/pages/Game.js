@@ -6,19 +6,11 @@ import Boat, {BOATTYPE} from '../Components/Boat';
 import Grid from '../Components/Grid';
 import autobind from 'class-autobind';
 
-const State = {
-    YOUR_TURN: 1,
-    OPPONENT_TURN: 2,
-    SETUP: 3,
-    OPPONENT_RECONNECTING: 4
-};
-
 export default class Game extends Component {
     constructor(props) {
         super(props);
 
         const mainState = this.props.location.state;
-        mainState.current = State.SETUP;
         this.state = {
             ...mainState, 
             setBoats: [],
@@ -38,14 +30,6 @@ export default class Game extends Component {
                 otherUsername: data.opponent,
                 leader: data.leader
             });
-        });
-
-        socket.on('opponentReconnecting', () => {
-            this.setState({previous: this.state.current, current: State.OPPONENT_RECONNECTING});
-        });
-
-        socket.on('opponentReconnected', () => {
-            this.setState({current: this.state.previous});
         });
 
         socket.on('opponentLeft', () => {
@@ -107,8 +91,8 @@ export default class Game extends Component {
     }
 
     getCurrentView() {
-        switch (this.state.current) {
-            case State.SETUP:
+        switch (socket.state) {
+            case "Setup":
                 return (
                     <Fragment>
                         <div className="info">
@@ -131,7 +115,7 @@ export default class Game extends Component {
                         <button onClick={this.submitSetup}>Submit</button>
                     </Fragment>
                 )
-            case State.OPPONENT_RECONNECTING:
+            case "OpponentReconnecting":
                 return <h1>Your opponent is reconnecting... <span role="img" aria-label="ANXIOUS!">😰</span></h1>;
             default:
                 return <h1>Oopsie whoopsie, unknown state <span role="img" aria-label="SAD!">😔</span></h1>;
