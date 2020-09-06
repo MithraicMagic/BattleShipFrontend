@@ -5,23 +5,23 @@ import ReactDOM from 'react-dom';
 import './rensAlert.scss';
 import autobind from 'class-autobind';
 
-class RensAlert {
-	mergeObject(target) {
-		for (let i = 1; i < arguments.length; i++) {
-			const source = arguments[i];
-			for (const key in source) {
-				if (source.hasOwnProperty(key)) {
-					target[key] = source[key];
-				}
+function mergeObject(target) {
+	for (let i = 1; i < arguments.length; i++) {
+		const source = arguments[i];
+		for (const key in source) {
+			if (source.hasOwnProperty(key)) {
+				target[key] = source[key];
 			}
 		}
-		return target;
 	}
+	return target;
+}
 
+class RensAlert {
 	popup(props) {
 		const key = `RensAlertPopup.${Math.random()}`;
 
-		const mergedProps = this.mergeObject({
+		const mergedProps = mergeObject({
 			title: 'Popup',
 			text: 'Rens is super cool',
 			time: 0,
@@ -36,7 +36,7 @@ class RensAlert {
 	accept(props) {
 		const key = `RensAlertAccept.${Math.random()}`;
 
-		const mergedProps = this.mergeObject({
+		const mergedProps = mergeObject({
 			title: 'Accept',
 			text: 'Rens is nog steeds super cool',
 			accept: 'Ok',
@@ -52,7 +52,7 @@ class RensAlert {
 	confirm(props) {
 		const key = `RensAlertConfirm.${Math.random()}`;
 
-		const mergedProps = this.mergeObject({
+		const mergedProps = mergeObject({
 			title: 'Confirm',
 			text: 'Rens is BEST',
 			accept: 'Accept',
@@ -69,7 +69,7 @@ class RensAlert {
 	input(props) {
 		const key = `RensAlertInput.${Math.random()}`;
 
-		const mergedProps = this.mergeObject({
+		const mergedProps = mergeObject({
 			title: 'Input',
 			text: 'Rens is BEST!!',
 			accept: 'Accept',
@@ -101,15 +101,49 @@ class Popup extends React.Component {
 
 		this.state = props.options;
 		this.closeTimeout = null;
+		this.preTransitionStyle = new Map();
+
+		this.transitionStartTimeout = null;
+		this.transitionStopTimeout = null;
 
 		if (this.state.time !== 0) {
 			this.closeTimeout = setTimeout(() => {
 				this.onClose(); 
 			}, this.state.time);
 		}
+
+		if (this.state.transition) {
+			this.transitionStartTimeout = setTimeout(() => {
+				const pop = document.querySelector('.popup');
+				const currentStyle = this.state.style == null ? { } : { ...this.state.style };
+				const totalStyle = mergeObject(currentStyle, this.state.transition.style);
+
+				Object.entries(totalStyle).forEach(([key, value]) => {
+					this.preTransitionStyle.set(key, pop.style[key]);
+					pop.style[key] = value;
+				});
+			}, 100);
+
+			if (this.state.transition.time !== 0) {
+				this.transitionStopTimeout = setTimeout(() => {
+					const pop = document.querySelector('.popup');
+					this.preTransitionStyle.forEach((val, key) => {
+						pop.style[key] = val;
+					});
+				}, this.state.transition.time);
+			} 
+		}
 	}
 
 	componentWillUnmount() {
+		if (this.transitionStartTimeout) {
+			clearTimeout(this.transitionStartTimeout);
+		}
+
+		if (this.transitionStopTimeout) {
+			clearTimeout(this.transitionStopTimeout);
+		}
+
 		if (this.closeTimeout) {
 			clearTimeout(this.closeTimeout);
 			const element = document.getElementById(this.props.id);
@@ -150,10 +184,37 @@ class Accept extends React.Component {
 		this.state = props.options;
 		this.closeTimeout = null;
 
+		this.preTransitionStyle = new Map();
+
+		this.transitionStartTimeout = null;
+		this.transitionStopTimeout = null;
+
 		if (this.state.time !== 0) {
 			this.closeTimeout = setTimeout(() => {
 				this.onClose(); 
 			}, this.state.time);
+		}
+
+		if (this.state.transition) {
+			this.transitionStartTimeout = setTimeout(() => {
+				const pop = document.querySelector('.accept');
+				const currentStyle = this.state.style == null ? { } : { ...this.state.style };
+				const totalStyle = mergeObject(currentStyle, this.state.transition.style);
+
+				Object.entries(totalStyle).forEach(([key, value]) => {
+					this.preTransitionStyle.set(key, pop.style[key]);
+					pop.style[key] = value;
+				});
+			}, 100);
+
+			if (this.state.transition.time !== 0) {
+				this.transitionStopTimeout = setTimeout(() => {
+					const pop = document.querySelector('.accept');
+					this.preTransitionStyle.forEach((val, key) => {
+						pop.style[key] = val;
+					});
+				}, this.state.transition.time);
+			} 
 		}
 	}
 
@@ -205,10 +266,37 @@ class Confirm extends React.Component {
 		this.state = props.options;
 		this.closeTimeout = null;
 
+		this.preTransitionStyle = new Map();
+
+		this.transitionStartTimeout = null;
+		this.transitionStopTimeout = null;
+
 		if (this.state.time !== 0) {
 			this.closeTimeout = setTimeout(() => {
 				this.onClose(); 
 			}, this.state.time);
+		}
+
+		if (this.state.transition) {
+			this.transitionStartTimeout = setTimeout(() => {
+				const pop = document.querySelector('.confirm');
+				const currentStyle = this.state.style == null ? { } : { ...this.state.style };
+				const totalStyle = mergeObject(currentStyle, this.state.transition.style);
+
+				Object.entries(totalStyle).forEach(([key, value]) => {
+					this.preTransitionStyle.set(key, pop.style[key]);
+					pop.style[key] = value;
+				});
+			}, 100);
+
+			if (this.state.transition.time !== 0) {
+				this.transitionStopTimeout = setTimeout(() => {
+					const pop = document.querySelector('.confirm');
+					this.preTransitionStyle.forEach((val, key) => {
+						pop.style[key] = val;
+					});
+				}, this.state.transition.time);
+			} 
 		}
 	}
 
@@ -269,10 +357,37 @@ class Input extends React.Component {
 		this.state.inputValue = '';
 		this.closeTimeout = null;
 
+		this.preTransitionStyle = new Map();
+
+		this.transitionStartTimeout = null;
+		this.transitionStopTimeout = null;
+
 		if (this.state.time !== 0) {
 			this.closeTimeout = setTimeout(() => {
 				this.onClose(); 
 			}, this.state.time);
+		}
+
+		if (this.state.transition) {
+			this.transitionStartTimeout = setTimeout(() => {
+				const pop = document.querySelector('.input');
+				const currentStyle = this.state.style == null ? { } : { ...this.state.style };
+				const totalStyle = mergeObject(currentStyle, this.state.transition.style);
+
+				Object.entries(totalStyle).forEach(([key, value]) => {
+					this.preTransitionStyle.set(key, pop.style[key]);
+					pop.style[key] = value;
+				});
+			}, 100);
+
+			if (this.state.transition.time !== 0) {
+				this.transitionStopTimeout = setTimeout(() => {
+					const pop = document.querySelector('.input');
+					this.preTransitionStyle.forEach((val, key) => {
+						pop.style[key] = val;
+					});
+				}, this.state.transition.time);
+			} 
 		}
 	}
 

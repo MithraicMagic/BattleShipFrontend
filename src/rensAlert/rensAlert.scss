@@ -5,8 +5,6 @@
 		display: flex;
 		position: fixed;
 		flex-direction: column;
-		top: 25px;
-		right: 25px;
 		text-align: center;
 		background-color: darken($dark-blue-gray, 8);
 		width: 100%;
@@ -14,7 +12,6 @@
 		box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
 		z-index: 10000;
 		border-radius: 5px;
-		transition: 2s all;
 
 		h3 {
 			color: $vivid-sky-blue;

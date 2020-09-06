@@ -7,6 +7,8 @@ import Grid from '../Components/Grid';
 import autobind from 'class-autobind';
 import { withRouter } from 'react-router-dom';
 
+import { DEFAULT_STYLE, NON_TIMED } from '../rensAlertStyles';
+
 class Setup extends Component {
     constructor(props) {
         super(props);
@@ -39,7 +41,7 @@ class Setup extends Component {
         socket.on('opponentLeft', () => {
             rensalert.accept({
                 title: "Oh no!", text: "Your opponent has disconnected 😭", accept: 'Okay :(',
-                onAccept: () => this.props.history.push('/')
+                onAccept: () => this.props.history.push('/'), ...NON_TIMED
             });
         });
 
@@ -52,7 +54,7 @@ class Setup extends Component {
                 this.state.pendingBoat.element.classList.remove('placed');
             }
             if (data.event === 'submitSetup') {
-                rensalert.popup({ title: 'LOOOOLLL DOM EN SLECHT 👨🏼‍🦳', text: 'JE DACHT IK DOE DIT EVEN SNEL, MAAR NEE, JE IQ IS VEEEEEEL TE LAAG (doe je setup even opnieuw)', time: 4000 });
+                rensalert.popup({ title: 'LOOOOLLL DOM EN SLECHT 👨🏼‍🦳', text: 'JE DACHT IK DOE DIT EVEN SNEL, MAAR NEE, JE IQ IS VEEEEEEL TE LAAG (doe je setup even opnieuw)', ...DEFAULT_STYLE });
                 document.getElementById('sub-btn').disabled = false;
             }
 
@@ -65,11 +67,11 @@ class Setup extends Component {
         });
 
         socket.on('opponentSubmitted', () => {
-            rensalert.popup({ title: 'SLOME SLET', text: 'WTF, MIJN OMA IS SNELLER. (en je tegenstander ook)', time: 4000 });
+            rensalert.popup({ title: 'SLOME SLET', text: 'WTF, MIJN OMA IS SNELLER. (en je tegenstander ook)', ...DEFAULT_STYLE });
         });
 
         socket.on('setupAccepted', () => {
-            rensalert.popup({ title: 'WOW 🔮🤣🤣', text: 'HAHA JE TEGENSTANDER IS SLOOM EN SHIT, ff wachten nog... ohja je setup was goed hoor', time: 4000 });
+            rensalert.popup({ title: 'WOW 🔮🤣🤣', text: 'HAHA JE TEGENSTANDER IS SLOOM EN SHIT, ff wachten nog... ohja je setup was goed hoor', ...DEFAULT_STYLE });
         });
 
         socket.on('gameStarted', () => {
@@ -275,7 +277,7 @@ class Setup extends Component {
             decline: "No",
             onAccept: () => {
                 socket.emit('leaveLobby', { uid: socket.uid, lobbyId: this.state.lobbyId });
-            }
+            }, ...NON_TIMED
         })
     }
 

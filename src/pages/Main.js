@@ -6,11 +6,13 @@ import autobind from 'class-autobind';
 import rensalert from '../rensAlert/rensAlert';
 import { withRouter } from 'react-router-dom';
 
+import { DEFAULT_STYLE } from '../rensAlertStyles';
+
 class Main extends Component {
     constructor(props) {
         super(props);
         autobind(this);
-
+    
         this.state = {};
     }
 
@@ -58,7 +60,11 @@ class Main extends Component {
         });
 
         socket.on('opponentLeft', () => {
-            rensalert.popup({ title: "Oh no!", text: "Your opponent has disconnected 😭", time: 5000 });
+            rensalert.popup({ 
+                title: "Oh no!", 
+                text: "Your opponent has disconnected 😭", 
+                ...DEFAULT_STYLE
+            });
         });
 
         socket.on('setupStarted', () => this.props.history.push('/setup'));
@@ -71,11 +77,19 @@ class Main extends Component {
     submitUsername() {
         const name = document.getElementById('username').value.trimLeft().trimRight();
         if (!name || name.length < 4) {
-            rensalert.popup({ title: 'Oopsie!', text: 'Please enter a username that is longer than 4 characters', time: 4000 });
+            rensalert.popup({ 
+                title: 'Oopsie!', 
+                text: 'Please enter a username that is longer than 4 characters', 
+                ...DEFAULT_STYLE
+            });
             return;
         }
         if (name.length > 20) {
-            rensalert.popup({ title: 'Oopsie!', text: 'Please enter a username that is shorter than 20 characters', time: 4000 });
+            rensalert.popup({ 
+                title: 'Oopsie!',
+                text: 'Please enter a username that is shorter than 20 characters', 
+                ...DEFAULT_STYLE
+            });
             return;
         }
         socket.emit('inputUsername', document.getElementById('username').value);
