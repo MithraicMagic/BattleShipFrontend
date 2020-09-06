@@ -84,6 +84,10 @@
     .bottom {
         display: flex;
         align-items: center;
+
+        button:disabled {
+            background: gray;
+        }
     }
 
     .carrier .cell, 

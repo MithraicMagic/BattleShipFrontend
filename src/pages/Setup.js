@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import socket from '../socket';
 import rensalert from '../rensAlert/rensAlert';
-import '../scss/game.scss';
+import '../scss/setup.scss';
 import Boat, { BOATTYPE, BOATDATA } from '../Components/Boat';
 import Grid from '../Components/Grid';
 import autobind from 'class-autobind';
@@ -90,7 +90,7 @@ class Setup extends Component {
 
     componentWillUnmount() {
         socket.removeListeners();
-        
+
         document.removeEventListener('mousemove', this.updateMousePos);
         document.removeEventListener('mousedown', this.onMouseDown);
         document.removeEventListener('keydown', this.rotateShip);
