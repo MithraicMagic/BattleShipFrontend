@@ -17,4 +17,42 @@
             margin: 5px 0;
         }
     }
+
+    .top {
+        position: relative;
+        width: auto;
+
+        .code {
+            width: 100%;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: 0.3s color; 
+            
+            &:hover {
+                color: $vivid-sky-blue;
+            }
+        }
+
+        .copyPopup {
+            position: absolute;
+            left: calc(50% - 100px);
+            bottom: -80px;
+            width: 200px;
+            height: 40px;
+            background-color: $vivid-sky-blue;
+            transition: 0.5s all;
+            opacity: 0;
+
+            &.visible {
+                transform: translateY(-40px);
+                opacity: 1;
+            }
+
+            p {
+                font-size: 16px;
+            }
+        }
+    }
+
+    
 }
