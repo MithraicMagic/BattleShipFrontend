@@ -17,6 +17,14 @@ class Main extends Component {
     componentDidMount() {
         socket.onStateSwitch = () => { this.forceUpdate(); }
 
+        socket.emit('getNameData', socket.uid);
+        socket.on('nameData', (data) => {
+            this.setState({
+                playerCode: data.code,
+                username: data.me
+            });
+        });
+
         socket.on('nameAccepted', (data) => {
             socket.setUid(data.uid);
             this.setState({
@@ -33,13 +41,6 @@ class Main extends Component {
             });
         });
 
-        socket.on('reconnect', (data) => {
-            this.setState({
-                playerCode: data.code,
-                username: data.me
-            });
-        });
-
         socket.on('reconnectLobby', (data) => {
             this.setState({
                 lobbyId: data.lobbyId,
@@ -53,7 +54,7 @@ class Main extends Component {
             rensalert.popup({ title: "Oh no!", text: "Your opponent has disconnected 😭" });
         });
 
-        socket.on('gameStarted', () => this.props.history.push({ pathname: '/game', state: this.state }));
+        socket.on('gameStarted', () => this.props.history.push('/game'));
     }
 
     componentWillUnmount() {

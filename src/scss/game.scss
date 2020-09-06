@@ -96,4 +96,16 @@
         background: $minesweeper;
         border: 1px solid darken($minesweeper, 15);
     }
+
+    .bottom {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+
+        button {
+            margin: auto 2%;
+            width: 50%;
+            max-width: 150px;
+        }
+    }
 }
