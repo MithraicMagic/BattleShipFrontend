@@ -42,6 +42,7 @@
             background-color: $vivid-sky-blue;
             transition: 0.5s all;
             opacity: 0;
+            user-select: none;
 
             &.visible {
                 transform: translateY(-40px);

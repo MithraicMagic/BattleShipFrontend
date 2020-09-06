@@ -34,6 +34,6 @@ export default class Boat extends Component {
 
     render() {
         const boatData = BOATDATA.get(this.state.boatType);
-        return <div boattype={this.props.boatType} className={'boat ' + boatData.class} onClick={this.props.onClick}>{this.getCells(boatData.size)}</div>
+        return <div boattype={this.props.boatType} id={this.props.id} className={'boat ' + boatData.class} onClick={this.props.onClick}>{this.getCells(boatData.size)}</div>
     }
 }

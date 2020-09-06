@@ -61,7 +61,7 @@ class Main extends Component {
             rensalert.popup({ title: "Oh no!", text: "Your opponent has disconnected 😭", time: 5000 });
         });
 
-        socket.on('gameStarted', () => this.props.history.push('/game'));
+        socket.on('setupStarted', () => this.props.history.push('/setup'));
     }
 
     componentWillUnmount() {
@@ -86,7 +86,7 @@ class Main extends Component {
     }
 
     emitStart() {
-        socket.emit('startGame', this.state.lobbyId);
+        socket.emit('startSetup', this.state.lobbyId);
     }
 
     async onCodeClick() {
