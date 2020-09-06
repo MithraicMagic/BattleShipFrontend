@@ -9,7 +9,7 @@ export const BOATTYPE = {
     MINESWEEPER: 5
 }
 
-const BOATDATA = new Map([
+export const BOATDATA = new Map([
     [BOATTYPE.AIRCRAFT_CARRIER, { size: 5, class: 'carrier' }],
     [BOATTYPE.BATTLESHIP, { size: 4, class: 'battleship' }],
     [BOATTYPE.CRUISER, { size: 3, class: 'cruiser' }],
