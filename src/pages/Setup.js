@@ -207,31 +207,14 @@ class Setup extends Component {
     onMouseDown(m) {
         if (this.state.pendingBoat) return;
         if (this.state.currentBoat) {
-            const el = this.state.currentBoat.element;
-
             //If the right mouse button was clicked, or if the boat was placed outside of the board
             if (m.button === 2 || !this.state.currentBoat.onBoard) {
-                el.classList.remove('active', 'placed');
-
-                //Remove boat from the grid
-                document.querySelectorAll('.grid-cell').forEach(cell => {
-                    if (cell.classList.contains(BOATDATA.get(this.state.currentBoat.type).class)) {
-                        cell.classList.remove(BOATDATA.get(this.state.currentBoat.type).class, 'active');
-                        if (cell.getAttribute('boattype') === BOATDATA.get(this.state.currentBoat.type).class) cell.removeAttribute('boattype');
-                    }
-                });
-
-                socket.emit('removeShip', {
-                    lobbyId: this.state.lobbyId,
-                    uid: socket.uid,
-                    ship: BOATDATA.get(this.state.currentBoat.type).class
-                })
-
+                this.removeBoatFromGrid(this.state.currentBoat);
                 this.setState({ availableBoats: [...this.state.availableBoats, this.state.currentBoat], currentBoat: null });
                 return;
             }
 
-            el.classList.add('placed');
+            this.state.currentBoat.element.classList.add('placed');
 
             //Add placed boat to setBoats
             const tile = this.calculateTile(m);
@@ -276,12 +259,46 @@ class Setup extends Component {
         }
     }
 
+    removeBoatFromGrid(boat) {
+        const boatData = BOATDATA.get(boat.type);
+        boat.element.classList.remove('active', 'placed');
+
+        //Remove boat from the grid
+        document.querySelectorAll('.grid-cell').forEach(cell => {
+            if (cell.classList.contains(boatData.class)) {
+                cell.classList.remove(boatData.class, 'active');
+                if (cell.getAttribute('boattype') === boatData.class) cell.removeAttribute('boattype');
+            }
+        });
+
+        socket.emit('removeShip', {
+            lobbyId: this.state.lobbyId,
+            uid: socket.uid,
+            ship: boatData.class
+        });
+    }
+
+    clearBoats() {
+        if (this.state.setBoats.length < 1) {
+            rensAlert.popup({ title: "Cleared Grid", text: "There were no boats on the grid though", ...DEFAULT_STYLE });
+            return;
+        }
+
+        this.state.setBoats.forEach(boat => {
+            this.removeBoatFromGrid(boat);
+        });
+
+        this.setState({availableBoats: [...this.state.availableBoats, ...this.state.setBoats], setBoats: []});
+
+        rensAlert.popup({title: "Cleared Grid", text: "Your grid has been cleared!", ...DEFAULT_STYLE});
+    }
+
     submitSetup() {
         if (this.state.availableBoats.length < 1 && !this.state.currentBoat && !this.state.pendingBoat) {
             socket.emit('submitSetup', { lobbyId: this.state.lobbyId, uid: socket.uid });
             document.getElementById('sub-btn').disabled = true;
         } else {
-            rensAlert({title: 'WHOA!', text: 'You have to place all of your ships before submitting!', ...DEFAULT_STYLE});
+            rensAlert.popup({title: 'WHOA!', text: 'You have to place all of your ships before submitting!', ...DEFAULT_STYLE});
         }
     }
 
@@ -309,12 +326,15 @@ class Setup extends Component {
                             e.stopPropagation();
                         }}>
                             <Grid id="grid" />
-                            <div className="boats">
-                                <Boat id="carrier" boatType={BOATTYPE.AIRCRAFT_CARRIER}></Boat>
-                                <Boat id="battleship" boatType={BOATTYPE.BATTLESHIP}></Boat>
-                                <Boat id="cruiser" boatType={BOATTYPE.CRUISER}></Boat>
-                                <Boat id="submarine" boatType={BOATTYPE.SUBMARINE}></Boat>
-                                <Boat id="minesweeper" boatType={BOATTYPE.MINESWEEPER}></Boat>
+                            <div className="dock">
+                                <button onClick={this.clearBoats}>Clear Grid</button>
+                                <div className="boats">
+                                    <Boat id="carrier" boatType={BOATTYPE.AIRCRAFT_CARRIER}></Boat>
+                                    <Boat id="battleship" boatType={BOATTYPE.BATTLESHIP}></Boat>
+                                    <Boat id="cruiser" boatType={BOATTYPE.CRUISER}></Boat>
+                                    <Boat id="submarine" boatType={BOATTYPE.SUBMARINE}></Boat>
+                                    <Boat id="minesweeper" boatType={BOATTYPE.MINESWEEPER}></Boat>
+                                </div>
                             </div>
                         </div>
                         <div className="bottom">

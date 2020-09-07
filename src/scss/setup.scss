@@ -33,27 +33,42 @@
             margin: 20px;
         }
 
-        .boats {
+        .dock {
             width: 500px;
             height: 500px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            
-            > div {
-                margin: 10px;
-                box-sizing: border-box;
-                border: 4px solid transparent;
-                transition: .3s all;
-                cursor: pointer;
+
+            button {
+                background: darken($dark-blue-gray, 15);
+
+                &:hover {
+                    background: darken($dark-blue-gray, 20);
+                }
             }
 
-            > .placed {
-                cursor: default;
-            }
+            .boats {
+                display: flex;
+                justify-content: center;
+                align-items: center;
 
-            > .active {
-                border: 4px solid rgb(0, 241, 189);
+                > div {
+                    margin: 10px;
+                    box-sizing: border-box;
+                    border: 4px solid transparent;
+                    transition: .3s all;
+                    cursor: pointer;
+                }
+
+                >.placed {
+                    cursor: default;
+                }
+
+                >.active {
+                    border: 4px solid rgb(0, 241, 189);
+                }
             }
         }
     }
@@ -86,6 +101,14 @@
         width: 100%;
         justify-content: center;
         align-items: center;
+
+        #sub-btn {
+            background: $green;
+
+            &:hover {
+                background: darken($green, 5);
+            }
+        }
 
         button {
             margin: 0 10px;
