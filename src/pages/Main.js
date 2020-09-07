@@ -120,7 +120,7 @@ class Main extends Component {
                 return (
                     <div>
                         <h2>Enter your desired username!</h2>
-                        <input type="text" id="username" autoComplete="off" data-lpignore="true"></input>
+                        <input type="text" id="username" autoComplete="off" data-lpignore="true" onKeyDown={(k) => k.key === 'Enter' ? this.submitUsername() : null}></input>
                         <button onClick={this.submitUsername}>Submit</button>
                     </div>
                 );
@@ -136,7 +136,7 @@ class Main extends Component {
                         </div>
                         <div>
                             <h2>Enter a friend's code here</h2>
-                            <input type="text" id="code" autoComplete="off"></input>
+                            <input type="text" id="code" autoComplete="off" onKeyDown={(k) => k.key === 'Enter' ? this.tryCode() : null}></input>
                             <button onClick={this.tryCode}>Try Code</button>
                         </div>
                     </Fragment>

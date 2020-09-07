@@ -17,7 +17,8 @@ class Setup extends Component {
             availableBoats: [],
             setBoats: [],
             currentBoat: null,
-            lastBoat: null
+            lastBoat: null,
+            opponentReady: false
         };
         socket.state = 'Setup';
 
@@ -67,15 +68,18 @@ class Setup extends Component {
         });
 
         socket.on('opponentSubmitted', () => {
-            rensalert.popup({ title: 'SLOME SLET', text: 'WTF, MIJN OMA IS SNELLER. (en je tegenstander ook)', ...DEFAULT_STYLE });
+            rensalert.popup({ title: 'Shoot up!', text: 'Your opponent is ready', ...DEFAULT_STYLE });
+            this.setState({opponentReady: true});
         });
 
         socket.on('setupAccepted', () => {
-            rensalert.popup({ title: 'WOW 🔮🤣🤣', text: 'HAHA JE TEGENSTANDER IS SLOOM EN SHIT, ff wachten nog... ohja je setup was goed hoor', ...DEFAULT_STYLE });
+            document.getElementById('overlay').classList.remove('hidden');
         });
 
         socket.on('gameStarted', () => {
-            this.props.history.push('/game');
+            setTimeout(() => {
+                this.props.history.push('/game');
+            }, 2000)
         });
 
         document.addEventListener('mousemove', this.updateMousePos);
@@ -99,7 +103,6 @@ class Setup extends Component {
     }
 
     placeBoats(data) {
-        console.log(data);
         data.forEach(boat => {
             const localBoat = this.state.availableBoats.find(b => BOATDATA.get(Number(b.element.getAttribute('boattype'))).class === boat.name);
             const boatData = BOATDATA.get(localBoat.type);
@@ -311,16 +314,34 @@ class Setup extends Component {
                 )
             case "OpponentReconnecting":
                 return <h1>Your opponent is reconnecting... <span role="img" aria-label="ANXIOUS!">😰</span></h1>;
+            case "OpponentTurn" || "YourTurn":
+                return <h1>Game is about to start...</h1>
             default:
                 return <h1>Oopsie whoopsie, unknown state <span role="img" aria-label="SAD!">😔</span></h1>;
         }
     }
 
+    getOverlayContent() {
+        return (
+            <div>
+                <h1>Waiting for {this.state.otherUsername}... {this.state.opponentReady ? '✅' : '⛔'}</h1>
+            </div>
+        )
+    }
+
     render() {
         return (
-            <div className="game-page">
-                {this.getCurrentView()}
-            </div>
+            <Fragment>
+                <div className="game-page">
+                    {this.getCurrentView()}
+
+                </div>
+                <div className="overlay hidden" id="overlay">
+                    <div className='overlay-content'>
+                        {this.getOverlayContent()}
+                    </div>
+                </div>
+            </Fragment>
         )
     }
 }
