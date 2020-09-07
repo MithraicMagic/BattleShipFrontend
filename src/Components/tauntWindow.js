@@ -43,10 +43,7 @@ export default class tauntWindow extends Component {
             data.received.forEach((m, index) => {
                 messages.push(<Message key={"r" + index} message={m.message} time={m.time} sent={false}/>);
             });
-
-            const rens = messages[0].props.time;
-            console.log(rens, buildDate(rens));
-
+            
             messages.sort((a, b) => buildDate(a.props.time) - buildDate(b.props.time));
             this.setState({ messages });
         });

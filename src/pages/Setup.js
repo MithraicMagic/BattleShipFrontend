@@ -26,7 +26,17 @@ class Setup extends Component {
     }
 
     componentDidMount() {
-        socket.onStateSwitch = () => { this.forceUpdate(); }
+        socket.onStateSwitch = () => { 
+            if (socket.state === "OpponentReconnecting") {
+                rensAlert.popup({
+                    title: "Oh Noes!",
+                    text: "Your opponent is reconnecting... 😰",
+                    ...DEFAULT_STYLE
+                });
+                return;
+            }
+            this.forceUpdate(); 
+        }
 
         socket.emit('getSetupData', socket.uid);
         socket.on('setupData', (data) => {
@@ -74,10 +84,6 @@ class Setup extends Component {
         socket.on('opponentSubmitted', () => {
             rensAlert.popup({ title: 'Shoot up!', text: 'Your opponent is ready', ...DEFAULT_STYLE });
             this.setState({opponentReady: true});
-        });
-
-        socket.on('setupAccepted', () => {
-            document.getElementById('overlay').classList.remove('hidden');
         });
 
         socket.on('gameStarted', () => {
@@ -289,6 +295,8 @@ class Setup extends Component {
     getCurrentView() {
         switch (socket.state) {
             case "Setup":
+            case "OpponentReconnecting":
+            case "SetupComplete":
                 return (
                     <Fragment>
                         <button onClick={() => socket.submitLeave(this.state.lobbyId)}>Leave</button>
@@ -315,9 +323,8 @@ class Setup extends Component {
                         </div>
                     </Fragment>
                 )
-            case "OpponentReconnecting":
-                return <h1>Your opponent is reconnecting... <span role="img" aria-label="ANXIOUS!">😰</span></h1>;
-            case ("OpponentTurn" || "YourTurn"):
+            case "OpponentTurn":
+            case "YourTurn":
                 return <h1>Game is about to start...</h1>
             default:
                 return <h1>Oopsie whoopsie, unknown state <span role="img" aria-label="SAD!">😔</span></h1>;
@@ -333,12 +340,14 @@ class Setup extends Component {
     }
 
     render() {
+        const hidden = socket.state !== "SetupComplete" && socket.state !== "YourTurn" && socket.state !== "OpponentTurn";
+
         return (
             <Fragment>
                 <div className="setup-page">
                     {this.getCurrentView()}
                 </div>
-                <div className="overlay hidden" id="overlay">
+                <div className={`overlay${(hidden ? " hidden" : "")}`} id="overlay">
                     <div className='overlay-content'>
                         {this.getOverlayContent()}
                     </div>

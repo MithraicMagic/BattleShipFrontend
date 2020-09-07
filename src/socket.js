@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 import RensAlert from './rensAlert/rensAlert';
-import { NON_TIMED } from './rensAlertStyles';
+import { NON_TIMED, DEFAULT_STYLE } from './rensAlertStyles';
 
 class Socket {
     constructor() {
@@ -39,6 +39,14 @@ class Socket {
                         opacity: '1'
                     }
                 }
+            });
+        });
+
+        this.on('opponentReconnected', () => {
+            RensAlert.popup({
+                title: 'Yay!',
+                text: 'Your opponent is back!',
+                ...DEFAULT_STYLE
             });
         });
 
