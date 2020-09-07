@@ -82,10 +82,16 @@
 
     .bottom {
         display: flex;
+        width: 100%;
+        justify-content: center;
         align-items: center;
 
-        button:disabled {
-            background: gray;
+        button {
+            margin: 0 10px;
+
+            &:disabled {
+                background: gray;
+            }
         }
     }
 }
