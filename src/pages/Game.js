@@ -105,7 +105,7 @@ export default class Game extends Component {
                 cell.classList.add('missed');
             }
         } else {
-            cell.innerText = 'X';
+            cell.innerHTML = '<svg viewBox="0 0 500 500"><path d="M 0 50 L 0 0 L 50 0 L 250 200 L 450 0 L 500 0 L 500 50 L 300 250 L 500 450 L 500 500 L 450 500 L 250 300 L 50 500 L 0 500 L 0 450 L 200 250 Z" /></svg> ';
         }
     }
 
@@ -123,6 +123,20 @@ export default class Game extends Component {
                     <div className="info">
                         <h1>It's the opponent's turn</h1>
                         <h2>Waiting for opponent to shoot one of your tiles...</h2>
+                    </div>
+                )
+            case "GameWon": 
+                return(
+                    <div className="info">
+                        <h1>You won the game!</h1>
+                        <h2>You destroyed all of the opponent's ships!</h2>
+                    </div>
+                )
+            case "GameLost": 
+                return(
+                    <div className="info">
+                        <h1>You lost <span role="img" aria-label="ULTRASAD!">😭</span></h1>
+                        <h2>Your opponent destroyed all of your ships...</h2>
                     </div>
                 )
             default:
