@@ -146,14 +146,14 @@ export default class Game extends Component {
                         <h2>Waiting for opponent to shoot one of your tiles...</h2>
                     </div>
                 )
-            case "GameWon": 
+            case "GameWon":
                 return(
                     <div className="info">
                         <h1>You won the game!</h1>
                         <h2>You destroyed all of the opponent's ships!</h2>
                     </div>
                 )
-            case "GameLost": 
+            case "GameLost":
                 return(
                     <div className="info">
                         <h1>You lost <span role="img" aria-label="ULTRASAD!">😭</span></h1>
@@ -176,13 +176,19 @@ export default class Game extends Component {
         )
     }
 
+    rematch() {
+        
+    }
+
     render() {
         return (
             <div className="game-page">
                 <button onClick={() => socket.submitLeave(this.state.lobbyId)}>Leave</button>
                 {this.getCurrentView()}
                 {this.showGrid()}
-                <div></div>
+                <div class="bottom">
+                    {socket.state === "YouWon" || socket.state === "YouLost" ? (<button onClick={this.rematch}>Rematch!</button>) : ''}
+                </div>
             </div>
         )
     }
