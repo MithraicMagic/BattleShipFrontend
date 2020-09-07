@@ -48,8 +48,18 @@
         flex-wrap: wrap;
 
         .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: $vivid-sky-blue;
             border: 1px solid darken($vivid-sky-blue, 15);
+            
+            svg {
+                border-radius: 0;
+                fill: darken($beau-blue, 20);
+                height: 75%;
+                width: 75%;
+            }
 
             &.hit {
                 background: $red-crayola;

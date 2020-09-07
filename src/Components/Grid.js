@@ -14,11 +14,13 @@ export default class Grid extends Component {
     }
 
     shootCell(i, j) {
-        socket.emit('shoot', {
-            uid: socket.uid,
-            lobbyId: this.props.lobbyId,
-            i, j
-        });
+        if (socket.state === "YourTurn") {
+            socket.emit('shoot', {
+                uid: socket.uid,
+                lobbyId: this.props.lobbyId,
+                i, j
+            });
+        }
     }
 
     render() {
