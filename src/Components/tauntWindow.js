@@ -114,7 +114,7 @@ export default class tauntWindow extends Component {
 
                 <form onSubmit={this.sendMessage}>
                     <input className="tauntText" type="text" placeholder="Taunt your opponent"/>
-                    <input type="submit" value="Send"/>
+                    <input type="submit" value="Send" autoComplete="off" data-lpignore="true"/>
                 </form>
             </div>
         )
