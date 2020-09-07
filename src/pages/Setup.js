@@ -332,9 +332,8 @@ class Setup extends Component {
     render() {
         return (
             <Fragment>
-                <div className="game-page">
+                <div className="setup-page">
                     {this.getCurrentView()}
-
                 </div>
                 <div className="overlay hidden" id="overlay">
                     <div className='overlay-content'>
