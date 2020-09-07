@@ -14,6 +14,7 @@ class Main extends Component {
         autobind(this);
     
         this.state = {};
+        this.copyPopupTimeout = null;
     }
 
     componentDidMount() {
@@ -72,6 +73,7 @@ class Main extends Component {
 
     componentWillUnmount() {
         socket.removeListeners();
+        if (this.copyPopupTimeout) clearTimeout(this.copyPopupTimeout);
     }
 
     submitUsername() {
@@ -109,7 +111,7 @@ class Main extends Component {
         );
 
         document.querySelector('.copyPopup').classList.add('visible');
-        setTimeout(() => {
+        this.copyPopupTimeout = setTimeout(() => {
             document.querySelector('.copyPopup').classList.remove('visible');
         }, 2000);
     }
