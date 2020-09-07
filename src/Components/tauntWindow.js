@@ -6,8 +6,18 @@ import '../scss/taunt.scss';
 import autobind from 'class-autobind';
 import { DEFAULT_STYLE, MESSAGE_STYLE } from '../rensAlertStyles';
 import socket from '../socket';
+import Message from './Message';
 
 const State = { DOWN: 0, UP: 1 };
+const InvisibleStates = [ "None", "EnterName", "Available" ];
+
+function buildDate(time) {
+    const d = new Date();
+    d.setHours(time.hour);
+    d.setMinutes(time.minute);
+    d.setSeconds(time.second);
+    return d;
+}
 
 export default class tauntWindow extends Component {
     constructor(props) {
@@ -16,28 +26,55 @@ export default class tauntWindow extends Component {
     
         this.state = {
             current: State.DOWN,
-            sent: [],
-            received: []
+            messages: [],
+            getMessagesEmitted: false
         };
     }
 
     componentDidMount() {
-        socket.emit('getMessages');
+        socket.onStateSwitchTaunt = this.onStateSwitch;
+        this.onStateSwitch();
+
         socket.on('messages', (data) => {
-            this.setState({
-                sent: data.sent,
-                received: data.received
+            const messages = [];
+            data.sent.forEach((m, index) => {
+                messages.push(<Message key={"s" + index} message={m.message} time={m.time} sent={true}/>);
             });
+            data.received.forEach((m, index) => {
+                messages.push(<Message key={"r" + index} message={m.message} time={m.time} sent={false}/>);
+            });
+
+            const rens = messages[0].props.time;
+            console.log(rens, buildDate(rens));
+
+            messages.sort((a, b) => buildDate(a.props.time) - buildDate(b.props.time));
+            this.setState({ messages });
         });
 
-        socket.on('messageReceived', (msg) => {
+        socket.on('messageReceived', (m) => {
             RensAlert.popup({ 
-                title: 'Message Received',
-                text: msg,
+                title: `Message from ${socket.opponent}`,
+                text: m.message,
                 ...MESSAGE_STYLE
             });
-            received.push(msg);
+            const messages = this.state.messages;
+            messages.push(<Message key={"r" + Math.random()} message={m.message} time={m.time} sent={false}/>);
+            this.setState({ messages });
         });
+    }
+
+    onStateSwitch() {
+        const tauntWindow = document.querySelector('.tauntWindow');
+        if (InvisibleStates.includes(socket.state)) {
+            tauntWindow.classList.add('hidden');
+        }
+        else {
+            tauntWindow.classList.remove('hidden');
+            if (!this.state.getMessagesEmitted) {
+                socket.emit('getMessages', socket.uid);
+                this.setState({ getMessagesEmitted: true });
+            }
+        }
     }
 
     changeTo(state) {
@@ -47,7 +84,9 @@ export default class tauntWindow extends Component {
         this.setState({ current: state });
     }
 
-    sendMessage() {
+    sendMessage(e) {
+        e.preventDefault();
+
         const textBox = document.querySelector('form .tauntText');
         const msg = textBox.value;
         if (msg.length < 3 || msg.length > 100) {
@@ -60,7 +99,9 @@ export default class tauntWindow extends Component {
         } 
 
         socket.emit('sendMessage', { lobbyId: this.props.lobbyId, uid: socket.uid, message: msg });
-        sent.push(msg);
+        const messages = this.state.messages;
+        messages.push(<Message key={"s" + Math.random()} message={msg} time={new Date().toTimeString()} sent={true}/>);
+        this.setState({ messages });
         textBox.value = "";
     }
 
@@ -69,6 +110,10 @@ export default class tauntWindow extends Component {
             <div className="tauntWindow" onClick={() => this.changeTo(State.UP)}>
                 <div className="close" onClick={() => this.changeTo(State.DOWN)}><span>Close</span></div>
                 <div className="open">Click to Taunt</div>
+
+                <div className="messages">
+                    {this.state.messages}
+                </div>
 
                 <form onSubmit={this.sendMessage}>
                     <input className="tauntText" type="text" placeholder="Taunt your opponent"/>
