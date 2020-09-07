@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 import RensAlert from './rensAlert/rensAlert';
-import { NON_TIMED } from './rensAlertStyles';
+import { NON_TIMED, DEFAULT_STYLE } from './rensAlertStyles';
 
 class Socket {
     constructor() {
@@ -9,6 +9,10 @@ class Socket {
         
         this.state = "EnterName";
         this.onStateSwitch = null;
+        this.onStateSwitchTaunt = null;
+
+        this.username = "";
+        this.opponent = "";
 
         this.listeners = [];
         this.init();
@@ -38,9 +42,18 @@ class Socket {
             });
         });
 
+        this.on('opponentReconnected', () => {
+            RensAlert.popup({
+                title: 'Yay!',
+                text: 'Your opponent is back!',
+                ...DEFAULT_STYLE
+            });
+        });
+
         this.on('playerState', (state) => {
             this.state = state;
             if (this.onStateSwitch) this.onStateSwitch();
+            if (this.onStateSwitchTaunt) this.onStateSwitchTaunt();
         });
 
         this.emit('lastUid', this.uid);
@@ -67,7 +80,17 @@ class Socket {
                 const lg = `[SOCKET] Receiving '${msg}'` + (process.env.REACT_APP_LOG_PAYLOAD === 'true' ? ` with payload: ${JSON.stringify(data)}` : '');
                 console.log(lg);
             }
-            if (func) func(...data);
+            if (func) {
+                data.forEach((d) => {
+                    const username = Object.entries(d).find(([key, value]) => key === "me");
+                    const opponent = Object.entries(d).find(([key, value]) => key === "opponent" || key === "otherName");
+
+                    if (username) this.username = username[1];
+                    if (opponent) this.opponent = opponent[1];
+                });
+
+                func(...data);
+            }
         });
     }
 

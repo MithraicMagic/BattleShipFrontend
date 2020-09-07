@@ -19,7 +19,17 @@ export default class Game extends Component {
     }
 
     componentDidMount() {
-        socket.onStateSwitch = () => this.forceUpdate();
+        socket.onStateSwitch = () => {
+            if (socket.state === "OpponentReconnecting") {
+                rensAlert.popup({
+                    title: "Oh Noes!",
+                    text: "Your opponent is reconnecting... 😰",
+                    ...DEFAULT_STYLE
+                });
+                return;
+            }
+            this.forceUpdate();
+        }
 
         socket.emit('getGameData', socket.uid)
         socket.on('gameData', (data) => {

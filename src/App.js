@@ -7,6 +7,7 @@ import './scss/general.scss';
 import Main from './pages/Main';
 import Setup from './pages/Setup';
 import Game from './pages/Game';
+import TauntWindow from './Components/tauntWindow';
 
 export default class App extends Component {
   render() {
@@ -20,6 +21,7 @@ export default class App extends Component {
             <Route path={'/'} component={Main} />
           </Switch>
         </Router>
+        <TauntWindow/>
       </>
     )
   }
