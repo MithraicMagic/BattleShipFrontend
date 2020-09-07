@@ -5,7 +5,7 @@ import Grid from '../Components/Grid';
 import autobind from 'class-autobind';
 import '../scss/game.scss';
 import rensAlert from '../rensAlert/rensAlert';
-import { DEFAULT_STYLE } from '../rensAlertStyles';
+import { DEFAULT_STYLE, NON_TIMED } from '../rensAlertStyles';
 
 export default class Game extends Component {
     constructor(props) {
@@ -59,6 +59,17 @@ export default class Game extends Component {
                 this.registerShot(false, false, data.pos);
                 rensAlert.popup({title: 'Hehehe', text:'Your opponent missed! 😈', ...DEFAULT_STYLE})
             }
+        });
+
+        socket.on('lobbyLeft', () => {
+            this.props.history.push('/');
+        });
+
+        socket.on('opponentLeft', () => {
+            rensAlert.accept({
+                title: "Oh no!", text: "Your opponent has disconnected 😭", accept: 'Okay :(',
+                onAccept: () => this.props.history.push('/'), ...NON_TIMED
+            });
         });
     }
 

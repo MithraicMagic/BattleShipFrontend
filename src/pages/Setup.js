@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import socket from '../socket';
-import rensalert from '../rensAlert/rensAlert';
+import rensAlert from '../rensAlert/rensAlert';
 import '../scss/setup.scss';
 import Boat, { BOATTYPE, BOATDATA } from '../Components/Boat';
 import Grid from '../Components/Grid';
@@ -44,7 +44,7 @@ class Setup extends Component {
         });
 
         socket.on('opponentLeft', () => {
-            rensalert.accept({
+            rensAlert.accept({
                 title: "Oh no!", text: "Your opponent has disconnected 😭", accept: 'Okay :(',
                 onAccept: () => this.props.history.push('/'), ...NON_TIMED
             });
@@ -59,7 +59,7 @@ class Setup extends Component {
                 this.state.pendingBoat.element.classList.remove('placed');
             }
             if (data.event === 'submitSetup') {
-                rensalert.popup({ title: 'LOOOOLLL DOM EN SLECHT 👨🏼‍🦳', text: 'JE DACHT IK DOE DIT EVEN SNEL, MAAR NEE, JE IQ IS VEEEEEEL TE LAAG (doe je setup even opnieuw)', ...DEFAULT_STYLE });
+                rensAlert.popup({ title: 'LOOOOLLL DOM EN SLECHT 👨🏼‍🦳', text: 'JE DACHT IK DOE DIT EVEN SNEL, MAAR NEE, JE IQ IS VEEEEEEL TE LAAG (doe je setup even opnieuw)', ...DEFAULT_STYLE });
                 document.getElementById('sub-btn').disabled = false;
             }
 
@@ -72,7 +72,7 @@ class Setup extends Component {
         });
 
         socket.on('opponentSubmitted', () => {
-            rensalert.popup({ title: 'Shoot up!', text: 'Your opponent is ready', ...DEFAULT_STYLE });
+            rensAlert.popup({ title: 'Shoot up!', text: 'Your opponent is ready', ...DEFAULT_STYLE });
             this.setState({opponentReady: true});
         });
 
@@ -83,7 +83,7 @@ class Setup extends Component {
         socket.on('gameStarted', () => {
             setTimeout(() => {
                 this.props.history.push('/game');
-            }, 2000)
+            }, 3000)
         });
 
         document.addEventListener('mousemove', this.updateMousePos);
@@ -275,7 +275,7 @@ class Setup extends Component {
             socket.emit('submitSetup', { lobbyId: this.state.lobbyId, uid: socket.uid });
             document.getElementById('sub-btn').disabled = true;
         } else {
-            rensalert({title: 'WHOA!', text: 'You have to place all of your ships before submitting!', ...DEFAULT_STYLE});
+            rensAlert({title: 'WHOA!', text: 'You have to place all of your ships before submitting!', ...DEFAULT_STYLE});
         }
     }
 
@@ -317,7 +317,7 @@ class Setup extends Component {
                 )
             case "OpponentReconnecting":
                 return <h1>Your opponent is reconnecting... <span role="img" aria-label="ANXIOUS!">😰</span></h1>;
-            case "OpponentTurn" || "YourTurn":
+            case ("OpponentTurn" || "YourTurn"):
                 return <h1>Game is about to start...</h1>
             default:
                 return <h1>Oopsie whoopsie, unknown state <span role="img" aria-label="SAD!">😔</span></h1>;
