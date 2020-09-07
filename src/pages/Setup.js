@@ -28,8 +28,8 @@ class Setup extends Component {
     componentDidMount() {
         socket.onStateSwitch = () => { this.forceUpdate(); }
 
-        socket.emit('getGameData', socket.uid);
-        socket.on('gameData', (data) => {
+        socket.emit('getSetupData', socket.uid);
+        socket.on('setupData', (data) => {
             this.setState({
                 lobbyId: data.lobbyId,
                 username: data.me,
@@ -37,6 +37,10 @@ class Setup extends Component {
                 leader: data.leader
             });
             this.placeBoats(data.boatData);
+        });
+
+        socket.on('autoPlaceShipsAccepted', data => {
+            this.placeBoats(data);
         });
 
         socket.on('opponentLeft', () => {
@@ -105,25 +109,27 @@ class Setup extends Component {
     placeBoats(data) {
         data.forEach(boat => {
             const localBoat = this.state.availableBoats.find(b => BOATDATA.get(Number(b.element.getAttribute('boattype'))).class === boat.name);
-            const boatData = BOATDATA.get(localBoat.type);
+            if (localBoat) {
+                const boatData = BOATDATA.get(localBoat.type);
 
-            localBoat.orientation = boat.horizontal ? 0 : 1;
+                localBoat.orientation = boat.horizontal ? 0 : 1;
 
-            const startX = localBoat.orientation === 1 ? boat.i : boat.i - Math.floor((boatData.size - .01) / 2);
-            const startY = localBoat.orientation === 0 ? boat.j : boat.j - Math.floor((boatData.size - .01) / 2);
+                const startX = localBoat.orientation === 1 ? boat.pos.i : boat.pos.i - Math.floor((boatData.size - .01) / 2);
+                const startY = localBoat.orientation === 0 ? boat.pos.j : boat.pos.j - Math.floor((boatData.size - .01) / 2);
 
-            for (let i = 0; i < boatData.size; i++) {
-                const cell = document.getElementById('x:' + (localBoat.orientation === 1 ? startX : startX + i) + '-y:' + (localBoat.orientation === 0 ? startY : startY + i));
+                for (let i = 0; i < boatData.size; i++) {
+                    const cell = document.getElementById('x:' + (localBoat.orientation === 1 ? startX : startX + i) + '-y:' + (localBoat.orientation === 0 ? startY : startY + i));
 
-                //Check if there is already another boat active on this tile
-                if (cell && !cell.classList.contains('active')) {
-                    cell.classList.add(boatData.class, 'active');
-                    cell.setAttribute('boattype', boatData.class);
+                    //Check if there is already another boat active on this tile
+                    if (cell && !cell.classList.contains('active')) {
+                        cell.classList.add(boatData.class, 'active');
+                        cell.setAttribute('boattype', boatData.class);
+                    }
                 }
-            }
 
-            localBoat.element.classList.add('placed');
-            this.setState({ setBoats: [...this.state.setBoats, localBoat], availableBoats: this.state.availableBoats.filter(b => b.type !== localBoat.type) });
+                localBoat.element.classList.add('placed');
+                this.setState({ setBoats: [...this.state.setBoats, localBoat], availableBoats: this.state.availableBoats.filter(b => b.type !== localBoat.type) });
+            }
         });
     }
 
@@ -265,23 +271,19 @@ class Setup extends Component {
     }
 
     submitSetup() {
-        // if (this.state.availableBoats.length < 1 && !this.state.currentBoat && !this.state.pendingBoat) {
-
-        // }
-        socket.emit('submitSetup', { lobbyId: this.state.lobbyId, uid: socket.uid });
-        document.getElementById('sub-btn').disabled = true;
+        if (this.state.availableBoats.length < 1 && !this.state.currentBoat && !this.state.pendingBoat) {
+            socket.emit('submitSetup', { lobbyId: this.state.lobbyId, uid: socket.uid });
+            document.getElementById('sub-btn').disabled = true;
+        } else {
+            rensalert({title: 'WHOA!', text: 'You have to place all of your ships before submitting!', ...DEFAULT_STYLE});
+        }
     }
 
-    submitLeave() {
-        rensalert.confirm({
-            title: "Are you sure",
-            text: "That you want to leave the lobby?",
-            accept: "Yes",
-            decline: "No",
-            onAccept: () => {
-                socket.emit('leaveLobby', { uid: socket.uid, lobbyId: this.state.lobbyId });
-            }, ...NON_TIMED
-        })
+    autoPlace() {
+        socket.emit('autoPlaceShips', {
+            lobbyId: this.state.lobbyId,
+            uid: socket.uid 
+        });
     }
 
     getCurrentView() {
@@ -289,7 +291,7 @@ class Setup extends Component {
             case "Setup":
                 return (
                     <Fragment>
-                        <button onClick={this.submitLeave}>Leave</button>
+                        <button onClick={() => socket.submitLeave(this.state.lobbyId)}>Leave</button>
                         <div className="info">
                             <h1>Setup Fase</h1>
                             <h2>Put all of your boats on the grid and press the button</h2>
@@ -309,6 +311,7 @@ class Setup extends Component {
                         </div>
                         <div className="bottom">
                             <button id="sub-btn" onClick={this.submitSetup}>Submit</button>
+                            <button id="auto-btn" onClick={this.autoPlace}>Auto-Place Ships</button>
                         </div>
                     </Fragment>
                 )
