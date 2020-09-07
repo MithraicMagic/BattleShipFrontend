@@ -64,7 +64,7 @@ class Setup extends Component {
             this.props.history.push('/');
         });
 
-        socket.on('errorEvent', (data) => {
+        socket.socket.on('errorEvent', (data) => {
             if (this.state.pendingBoat && data.event === 'placeShip') {
                 this.state.pendingBoat.element.classList.remove('placed');
             }

@@ -35,7 +35,7 @@ export default class tauntWindow extends Component {
         socket.onStateSwitchTaunt = this.onStateSwitch;
         this.onStateSwitch();
 
-        socket.on('messages', (data) => {
+        socket.socket.on('messages', (data) => {
             const messages = [];
             data.sent.forEach((m, index) => {
                 messages.push(<Message key={"s" + index} message={m.message} time={m.time} sent={true}/>);
@@ -48,7 +48,7 @@ export default class tauntWindow extends Component {
             this.setState({ messages });
         });
 
-        socket.on('messageReceived', (m) => {
+        socket.socket.on('messageReceived', (m) => {
             RensAlert.popup({ 
                 title: `Message from ${socket.opponent}`,
                 text: m.message,

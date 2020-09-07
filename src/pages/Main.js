@@ -18,6 +18,8 @@ class Main extends Component {
     }
 
     componentDidMount() {
+        const joinCode = new URL(window.location.href).searchParams.get('code');
+
         socket.onStateSwitch = () => { this.forceUpdate(); }
 
         socket.emit('getNameData', socket.uid);
@@ -27,11 +29,17 @@ class Main extends Component {
                 username: data.me
             });
         });
+        
+        if (joinCode != null) {
+            socket.emit('getLobbyInfo', joinCode)
+        }
+        socket.on('lobbyInfo', otherName => {
+            this.setState({otherName});
+        });
 
         socket.on('nameAccepted', (data) => {
             socket.setUid(data.uid);
 
-            const joinCode = new URL(window.location.href).searchParams.get('code');
             if (joinCode != null) {
                 document.getElementById('code').value = joinCode;
                 this.tryCode();
@@ -120,9 +128,10 @@ class Main extends Component {
     getCurrentView() {
         switch (socket.state) {
             case "EnterName":
+                const joinCode = new URL(window.location.href).searchParams.get('code');
                 return (
                     <div>
-                        <h2>Enter your desired username!</h2>
+                        {joinCode ? <h2>Enter a username to join {this.state.otherName}'s lobby!</h2> : <h2>Enter your desired username!</h2>}
                         <input type="text" id="username" autoComplete="off" data-lpignore="true" onKeyDown={(k) => k.key === 'Enter' ? this.submitUsername() : null}></input>
                         <button onClick={this.submitUsername}>Submit</button>
                     </div>

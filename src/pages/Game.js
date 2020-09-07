@@ -12,7 +12,9 @@ export default class Game extends Component {
         super(props);
 
         this.state = {
-            boats: []
+            boats: [],
+            rematch: false,
+            otherRematch: false
         }
 
         autobind(this);
@@ -27,6 +29,13 @@ export default class Game extends Component {
                     ...DEFAULT_STYLE
                 });
                 return;
+            }
+            if (socket.state === "Rematch") {
+                document.getElementById('rematch-btn').disabled = true;
+                this.setState({ rematch: true });
+            }
+            if (socket.state === "Setup") {
+                this.props.history.push('/setup');
             }
             this.forceUpdate();
         }
@@ -69,6 +78,10 @@ export default class Game extends Component {
                 this.registerShot(false, false, data.pos);
                 rensAlert.popup({title: 'Hehehe', text:'Your opponent missed! 😈', ...DEFAULT_STYLE})
             }
+        });
+
+        socket.on('otherRematch', () => {
+            this.setState({otherRematch: true});
         });
 
         socket.on('lobbyLeft', () => {
@@ -160,6 +173,13 @@ export default class Game extends Component {
                         <h2>Your opponent destroyed all of your ships...</h2>
                     </div>
                 )
+            case "Rematch":
+                return (
+                    <div className="info">
+                        <h1>Rematching may commence shortly! ⚔</h1>
+                        <h2>Waiting for the opponent to decide...</h2>
+                    </div>
+                )
             default:
                 return <h1>Oopsie whoopsie, unknown state <span role="img" aria-label="SAD!">😔</span></h1>;
         }
@@ -177,7 +197,22 @@ export default class Game extends Component {
     }
 
     rematch() {
-        
+        socket.emit('rematch', {
+            lobbyId: this.state.lobbyId,
+            uid: socket.uid
+        });
+    }
+
+    getBottom() {
+        if (socket.state === 'GameWon' || socket.state === 'GameLost' || socket.state === 'Rematch') {
+            return (
+                <Fragment>
+                    <button id="rematch-btn" onClick={this.rematch}>Rematch!</button>
+                    <h2>{ this.state.otherUsername } { !this.state.otherRematch ? 'has not yet decided ⛔😢' : 'wants to rematch! ✅😃' }</h2>
+                </Fragment>
+            )
+        }
+        return('');
     }
 
     render() {
@@ -186,8 +221,8 @@ export default class Game extends Component {
                 <button onClick={() => socket.submitLeave(this.state.lobbyId)}>Leave</button>
                 {this.getCurrentView()}
                 {this.showGrid()}
-                <div class="bottom">
-                    {socket.state === "YouWon" || socket.state === "YouLost" ? (<button onClick={this.rematch}>Rematch!</button>) : ''}
+                <div className="bottom">
+                    {this.getBottom()}
                 </div>
             </div>
         )

@@ -19,10 +19,10 @@ class Socket {
     }
 
     init() {
-        this.on('newUid', (data) => sessionStorage.setItem('userId', data.data));
+        this.socket.on('newUid', (data) => sessionStorage.setItem('userId', data.data));
 
-        this.on('message');
-        this.on('errorEvent', (data) => {
+        this.socket.on('message');
+        this.socket.on('errorEvent', (data) => {
             RensAlert.popup({
                 title: 'Oopsie!',
                 text: data.reason,
@@ -42,7 +42,7 @@ class Socket {
             });
         });
 
-        this.on('opponentReconnected', () => {
+        this.socket.on('opponentReconnected', () => {
             RensAlert.popup({
                 title: 'Yay!',
                 text: 'Your opponent is back!',
@@ -50,13 +50,13 @@ class Socket {
             });
         });
 
-        this.on('playerState', (state) => {
+        this.socket.on('playerState', (state) => {
             this.state = state;
             if (this.onStateSwitch) this.onStateSwitch();
             if (this.onStateSwitchTaunt) this.onStateSwitchTaunt();
         });
 
-        this.emit('lastUid', this.uid);
+        this.socket.emit('lastUid', this.uid);
     }
 
     setUid(uid) {
@@ -103,13 +103,14 @@ class Socket {
             onAccept: () => {
                 this.socket.emit('leaveLobby', { uid: this.uid, lobbyId });
             }, ...NON_TIMED
-        })
+        });
     }
 
     removeListeners() {
         this.listeners.forEach((l) => {
-            this.socket.removeListener(l.event, l.func);
+            this.socket.off(l.event);
         });
+
         this.listeners = [];
     }
 }
