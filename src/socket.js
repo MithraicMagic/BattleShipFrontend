@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import RensAlert from './rensAlert/rensAlert';
+import { NON_TIMED } from './rensAlertStyles';
 
 class Socket {
     constructor() {
@@ -68,6 +69,18 @@ class Socket {
             }
             if (func) func(...data);
         });
+    }
+
+    submitLeave(lobbyId) {
+        RensAlert.confirm({
+            title: "Are you sure",
+            text: "That you want to leave the lobby?",
+            accept: "Yes",
+            decline: "No",
+            onAccept: () => {
+                this.socket.emit('leaveLobby', { uid: this.uid, lobbyId });
+            }, ...NON_TIMED
+        })
     }
 
     removeListeners() {

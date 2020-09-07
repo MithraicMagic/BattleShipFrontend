@@ -89,41 +89,6 @@
             background: gray;
         }
     }
-
-    .carrier .cell, 
-    .grid .carrier {
-        background: $carrier;
-        border: 1px solid darken($carrier, 15);
-    }
-
-    .battleship .cell,
-    .grid .battleship {
-        background: $battleship;
-        border: 1px solid darken($battleship, 15);
-    }
-
-    .cruiser .cell,
-    .grid .cruiser {
-        background: $cruiser;
-        border: 1px solid darken($cruiser, 15);
-    }
-
-    .submarine .cell,
-    .grid .submarine {
-        background: $submarine;
-        border: 1px solid darken($submarine, 15);
-    }
-
-    .minesweeper .cell,
-    .grid .minesweeper {
-        background: $minesweeper;
-        border: 1px solid darken($minesweeper, 15);
-    }
-
-    .placed .cell {
-        background: $beau-blue;
-        border: 1px solid darken($beau-blue, 15);
-    }
 }
 
 .overlay {

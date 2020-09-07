@@ -1,0 +1,81 @@
+@import 'colors.scss';
+
+.game-page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+
+    //Leave button
+    > button {
+        align-self: flex-start;
+        margin: 10px 30px;
+    }
+
+    > div {
+        flex: 1;
+    }
+
+    .info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cell {
+        width: 50px;
+        height: 50px;
+        box-sizing: border-box;
+        border-radius: 0px;
+    }
+
+    .game-area {
+        display: flex;
+        width: 1100px;
+        justify-content: space-evenly;
+        background: lighten($dark-blue-gray, 5);
+
+        > div {
+            margin: 20px;
+        }
+    }
+
+    .grid {
+        display: flex;
+        width: 500px;
+        height: 500px;
+        flex-wrap: wrap;
+
+        .cell {
+            background: $vivid-sky-blue;
+            border: 1px solid darken($vivid-sky-blue, 15);
+
+            &.hit {
+                background: $red-crayola;
+                border: 1px solid darken($red-crayola, 15);
+            }
+
+            &.missed {
+                background: darken($vivid-sky-blue, 20);
+                border: 1px solid darken(darken($vivid-sky-blue, 20), 15);
+            }
+        }
+
+        &.active {
+            .cell:hover {
+                background: lighten($vivid-sky-blue, 15);
+                cursor: pointer;
+            }
+        }
+    }
+
+    .bottom {
+        display: flex;
+        align-items: center;
+
+        button:disabled {
+            background: gray;
+        }
+    }
+}
