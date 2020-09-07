@@ -112,7 +112,8 @@ class Main extends Component {
 
         document.querySelector('.copyPopup').classList.add('visible');
         this.copyPopupTimeout = setTimeout(() => {
-            document.querySelector('.copyPopup').classList.remove('visible');
+            const copyPopup = document.querySelector('.copyPopup');
+            if (copyPopup) copyPopup.classList.remove('visible');
         }, 2000);
     }
 
