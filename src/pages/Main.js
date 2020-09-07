@@ -107,7 +107,7 @@ class Main extends Component {
 
     async onCodeClick() {
         await navigator.clipboard.writeText(
-            `${process.env.REACT_APP_BASE_URL}/?code=${this.state.playerCode}`
+            `${window.location.host}/?code=${this.state.playerCode}`
         );
 
         document.querySelector('.copyPopup').classList.add('visible');
