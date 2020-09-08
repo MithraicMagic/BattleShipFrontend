@@ -115,7 +115,7 @@ class Main extends Component {
 
     async onCodeClick() {
         await navigator.clipboard.writeText(
-            `${window.location.host}/?code=${this.state.playerCode}`
+            `${window.location.protocol}//${window.location.host}/?code=${this.state.playerCode}`
         );
 
         document.querySelector('.copyPopup').classList.add('visible');
