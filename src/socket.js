@@ -23,22 +23,12 @@ class Socket {
 
         this.socket.on('message');
         this.socket.on('errorEvent', (data) => {
+            console.log('AARDAPPEL');
+
             RensAlert.popup({
                 title: 'Oopsie!',
                 text: data.reason,
-                style: {
-                    top: '-80px',
-                    right: '20px',
-                    transition: '0.3s all ease-out',
-                    opacity: '0'
-                },
-                transition: {
-                    time: 5000,
-                    style: {
-                        top: '25px',
-                        opacity: '1'
-                    }
-                }
+                ...DEFAULT_STYLE
             });
         });
 

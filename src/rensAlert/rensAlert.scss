@@ -1,6 +1,14 @@
 @import '../scss/colors.scss';
 
 #rensAlert {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	overflow-y: auto;
+	pointer-events: none;
+
 	.popup, .confirm, .accept, .input {
 		display: flex;
 		position: fixed;
@@ -12,6 +20,7 @@
 		box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
 		z-index: 10000;
 		border-radius: 5px;
+		pointer-events: initial;
 
 		h3 {
 			color: $vivid-sky-blue;
@@ -65,7 +74,7 @@
 				border-radius: 5px;
 				border: none;
 				color: #FFF;
-				padding: 0.5vh 1vw;
+				padding: 0.2vh 1vw;
 				margin: 0.2vh 0.2vw 1vh 0.2vw;
 			}
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import { RensAlertContainer } from './rensAlert/rensAlert';
+import RensAlert, { RensAlertContainer } from './rensAlert/rensAlert';
 
 import './scss/general.scss';
 import Main from './pages/Main';
@@ -13,7 +13,7 @@ export default class App extends Component {
   render() {
     return (
       <>
-        <RensAlertContainer />
+        <RensAlertContainer ref={RensAlert.container}/>
         <Router>
           <Switch>
             <Route path={'/game'} component={Game} />

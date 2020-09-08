@@ -1,6 +1,5 @@
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import './rensAlert.scss';
 import autobind from 'class-autobind';
@@ -17,94 +16,138 @@ function mergeObject(target) {
 	return target;
 }
 
+function genRandomString() {
+	return Math.random().toString().split('.')[1];
+}
+
+export const RensAlertSpawnType = {
+	PUSH: 0, REPLACE: 1, REPLACE_SAME_TYPE: 2
+};
+
+const ModalType = {
+	POPUP: 0, ACCEPT: 1, CONFIRM: 2, INPUT: 3
+};
+
 class RensAlert {
+	constructor() {
+		this.container = React.createRef();
+	}
+
 	popup(props) {
-		const key = `RensAlertPopup.${Math.random()}`;
+		const key = `popup${genRandomString()}`;
 
 		const mergedProps = mergeObject({
 			title: 'Popup',
 			text: 'Rens is super cool',
-			time: 0,
+			spawn: RensAlertSpawnType.REPLACE,
+			type: ModalType.POPUP
 		}, props);
 
-		const rensAlertContainer = document.getElementById('rensAlert');
-		if (rensAlertContainer) {
-			ReactDOM.render(<Popup key={key} id={key} options={mergedProps}/>, rensAlertContainer);
-		}
+		this.container.current.addModal(<Popup key={key} id={key} options={mergedProps} onClose={this.container.current.onClose}/>, mergedProps);
 	}
 
 	accept(props) {
-		const key = `RensAlertAccept.${Math.random()}`;
+		const key = `accept${genRandomString()}`;
 
 		const mergedProps = mergeObject({
 			title: 'Accept',
 			text: 'Rens is nog steeds super cool',
 			accept: 'Ok',
-			time: 0,
+			spawn: RensAlertSpawnType.REPLACE,
+			type: ModalType.ACCEPT
 		}, props);
 
-		const rensAlertContainer = document.getElementById('rensAlert');
-		if (rensAlertContainer) {
-			ReactDOM.render(<Accept key={key} id={key} options={mergedProps}/>, document.getElementById('rensAlert'));
-		}
+		this.container.current.addModal(<Accept key={key} id={key} options={mergedProps} onClose={this.container.current.onClose}/>, mergedProps);
 	}
 
 	confirm(props) {
-		const key = `RensAlertConfirm.${Math.random()}`;
+		const key = `confirm${genRandomString()}`;
 
 		const mergedProps = mergeObject({
 			title: 'Confirm',
 			text: 'Rens is BEST',
 			accept: 'Accept',
 			decline: 'Decline',
-			time: 0,
+			spawn: RensAlertSpawnType.REPLACE,
+			type: ModalType.CONFIRM
 		}, props);
 
-		const rensAlertContainer = document.getElementById('rensAlert');
-		if (rensAlertContainer) {
-			ReactDOM.render(<Confirm key={key} id={key} options={mergedProps}/>, document.getElementById('rensAlert'));
-		}
+		this.container.current.addModal(<Confirm key={key} id={key} options={mergedProps} onClose={this.container.current.onClose}/>, mergedProps);
 	}
 
 	input(props) {
-		const key = `RensAlertInput.${Math.random()}`;
+		const key = `input${genRandomString()}`;
 
 		const mergedProps = mergeObject({
 			title: 'Input',
 			text: 'Rens is BEST!!',
 			accept: 'Accept',
 			decline: 'Decline',
-			time: 0,
+			spawn: RensAlertSpawnType.REPLACE,
+			type: ModalType.INPUT
 		}, props);
 
-		const rensAlertContainer = document.getElementById('rensAlert');
-		if (rensAlertContainer) {
-			ReactDOM.render(<Input key={key} id={key} options={mergedProps}/>, document.getElementById('rensAlert'));
-		}
+		this.container.current.addModal(<Input key={key} id={key} options={mergedProps} onClose={this.container.current.onClose}/>, mergedProps);
 	}
 }
 
 export class RensAlertContainer extends React.Component {
+	constructor(props) {
+		super(props);
+		autobind(this);
+
+		this.state = { modals: [] };
+	}
+
+	onClose(id) {
+		const modals = this.state.modals;
+		modals.splice(modals.findIndex((m) => m.props.id === id), 1);
+		this.setState({ modals });
+	}
+
+	addModal(modal, props) {
+		let modals = this.state.modals;
+		
+		switch (props.spawn) {
+			case RensAlertSpawnType.REPLACE:
+				modals = [];
+				modals.push(modal);
+				break;
+			case RensAlertSpawnType.REPLACE_SAME_TYPE:
+				modals = modals.filter((m) => m.props.options.type !== props.type);
+				modals.unshift(modal);
+				break;
+			case RensAlertSpawnType.PUSH:
+			default:
+				modals.unshift(modal);
+				break;
+		}
+		
+		this.setState({ modals });
+	}
+
 	render() {
 		return (
 			<div id="rensAlert">
-				{this.props.children}
+				{this.state.modals}
 			</div>
 		);
 	}
 }
 
-class Popup extends React.Component {
+class Modal extends React.Component {
 	constructor(props) {
 		super(props);
 		autobind(this);
 
-		this.state = props.options;
-		this.closeTimeout = null;
+		this.state = mergeObject({ 
+			replace: true,
+			time: 0,
+			style: {}
+		}, { id: props.id, ...props.options });
 		this.preTransitionStyle = new Map();
 
-		this.transitionStartTimeout = null;
-		this.transitionStopTimeout = null;
+		this.timeouts = [];
 
 		if (this.state.time !== 0) {
 			this.closeTimeout = setTimeout(() => {
@@ -113,54 +156,88 @@ class Popup extends React.Component {
 		}
 
 		if (this.state.transition) {
-			this.transitionStartTimeout = setTimeout(() => {
-				const pop = document.querySelector('.popup');
-				const currentStyle = this.state.style == null ? { } : { ...this.state.style };
-				const totalStyle = mergeObject(currentStyle, this.state.transition.style);
+			this.addTransitions();
+		}
+	}
 
-				Object.entries(totalStyle).forEach(([key, value]) => {
-					this.preTransitionStyle.set(key, pop.style[key]);
-					pop.style[key] = value;
-				});
-			}, 100);
+	addTransitions() {
+		if (this.state.transition) {
+			if (this.state.transition.open) {
+				let startAfter = this.state.transition.open.startAfter;
+				if (!startAfter) startAfter = 100;
 
-			if (this.state.transition.time !== 0) {
-				this.transitionStopTimeout = setTimeout(() => {
-					const pop = document.querySelector('.popup');
-					this.preTransitionStyle.forEach((val, key) => {
-						pop.style[key] = val;
-					});
-				}, this.state.transition.time);
-			} 
+				this.timeouts.push(
+					setTimeout(() => {
+						const modal = document.querySelector(`#${this.props.id}`);
+						const currentStyle = { ...this.state.style };
+						const totalStyle = mergeObject(currentStyle, this.state.transition.open.style);
+			
+						Object.entries(totalStyle).forEach(([key, value]) => {
+							this.preTransitionStyle.set(key, modal.style[key]);
+							modal.style[key] = value;
+						});
+					}, startAfter)
+				);
+			}
+
+			if (this.state.transition.close) {
+				let startAfter = this.state.transition.close.startAfter;
+				if (startAfter) {
+					this.timeouts.push(
+						setTimeout(() => {
+							const modal = document.querySelector(`#${this.props.id}`);
+							if (!modal) return;
+
+							Object.entries({ ...this.state.transition.close.style }).forEach(([key, value]) => modal.style[key] = value);
+						}, startAfter)
+					);
+
+					let closeAfter = this.state.transition.close.time;
+					if (!closeAfter) closeAfter = 0;
+
+					closeAfter += startAfter;
+					this.timeouts.push(
+						setTimeout(() => {
+							this.onClose();
+						}, closeAfter)
+					);
+				}
+			}
 		}
 	}
 
 	componentWillUnmount() {
-		if (this.transitionStartTimeout) {
-			clearTimeout(this.transitionStartTimeout);
-		}
-
-		if (this.transitionStopTimeout) {
-			clearTimeout(this.transitionStopTimeout);
-		}
-
-		if (this.closeTimeout) {
-			clearTimeout(this.closeTimeout);
-			const element = document.getElementById(this.props.id);
-			if (element) element.style.display = 'none';
-		}
+		this.timeouts.forEach((t) => clearTimeout(t));
 	}
 
 	onClose() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onClose !== undefined) {
-			this.state.onClose();
-		}
+		this.props.onClose(this.state.id);
+		if (this.state.onClose) this.state.onClose();
 	}
+
+	onAccept(val) {
+		this.props.onClose(this.state.id);
+		if (this.state.onAccept) this.state.onAccept(val);
+	}
+
+	onDecline() {
+		this.props.onClose(this.state.id);
+		if (this.state.onDecline) this.state.onDecline();
+	}
+
+	render() { return <h1>hoi</h1>; }
+}
+
+class Popup extends Modal {
+	addTransitions() { super.addTransitions(); }
+
+	componentWillUnmount() { super.componentWillUnmount(); }
+
+	onClose() { super.onClose(); }
 
 	render() {
 		return (
-			<div style={this.state.style} id={this.props.id} className="popup">
+			<div style={this.state.style} id={this.props.id} onClick={this.onClick} className="popup">
 				<div className="top">
 					<button onClick={this.onClose}>X</button>
 				</div>
@@ -176,69 +253,14 @@ class Popup extends React.Component {
 	}
 }
 
-class Accept extends React.Component {
-	constructor(props) {
-		super(props);
-		autobind(this);
+class Accept extends Modal {
+	addTransitions() { super.addTransitions(); }
 
-		this.state = props.options;
-		this.closeTimeout = null;
+	componentWillUnmount() { super.componentWillUnmount(); }
 
-		this.preTransitionStyle = new Map();
+	onClose() { super.onClose(); }
 
-		this.transitionStartTimeout = null;
-		this.transitionStopTimeout = null;
-
-		if (this.state.time !== 0) {
-			this.closeTimeout = setTimeout(() => {
-				this.onClose(); 
-			}, this.state.time);
-		}
-
-		if (this.state.transition) {
-			this.transitionStartTimeout = setTimeout(() => {
-				const pop = document.querySelector('.accept');
-				const currentStyle = this.state.style == null ? { } : { ...this.state.style };
-				const totalStyle = mergeObject(currentStyle, this.state.transition.style);
-
-				Object.entries(totalStyle).forEach(([key, value]) => {
-					this.preTransitionStyle.set(key, pop.style[key]);
-					pop.style[key] = value;
-				});
-			}, 100);
-
-			if (this.state.transition.time !== 0) {
-				this.transitionStopTimeout = setTimeout(() => {
-					const pop = document.querySelector('.accept');
-					this.preTransitionStyle.forEach((val, key) => {
-						pop.style[key] = val;
-					});
-				}, this.state.transition.time);
-			} 
-		}
-	}
-
-	componentWillUnmount() {
-		if (this.closeTimeout) {
-			clearTimeout(this.closeTimeout);
-			const element = document.getElementById(this.props.id);
-			if (element) element.style.display = 'none';
-		}
-	}
-
-	onClose() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onClose !== undefined) {
-			this.state.onClose();
-		}
-	}
-
-	onAccept() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onAccept !== undefined) {
-			this.state.onAccept();
-		}
-	}
+	onAccept() { super.onAccept(); }
 
 	render() {
 		return (
@@ -258,76 +280,16 @@ class Accept extends React.Component {
 	}
 }
 
-class Confirm extends React.Component {
-	constructor(props) {
-		super(props);
-		autobind(this);
+class Confirm extends Modal {
+	addTransitions() { super.addTransitions(); }
 
-		this.state = props.options;
-		this.closeTimeout = null;
+	componentWillUnmount() { super.componentWillUnmount(); }
 
-		this.preTransitionStyle = new Map();
+	onClose() { super.onClose(); }
 
-		this.transitionStartTimeout = null;
-		this.transitionStopTimeout = null;
+	onAccept() { super.onAccept(); }
 
-		if (this.state.time !== 0) {
-			this.closeTimeout = setTimeout(() => {
-				this.onClose(); 
-			}, this.state.time);
-		}
-
-		if (this.state.transition) {
-			this.transitionStartTimeout = setTimeout(() => {
-				const pop = document.querySelector('.confirm');
-				const currentStyle = this.state.style == null ? { } : { ...this.state.style };
-				const totalStyle = mergeObject(currentStyle, this.state.transition.style);
-
-				Object.entries(totalStyle).forEach(([key, value]) => {
-					this.preTransitionStyle.set(key, pop.style[key]);
-					pop.style[key] = value;
-				});
-			}, 100);
-
-			if (this.state.transition.time !== 0) {
-				this.transitionStopTimeout = setTimeout(() => {
-					const pop = document.querySelector('.confirm');
-					this.preTransitionStyle.forEach((val, key) => {
-						pop.style[key] = val;
-					});
-				}, this.state.transition.time);
-			} 
-		}
-	}
-
-	componentWillUnmount() {
-		if (this.closeTimeout) {
-			clearTimeout(this.closeTimeout);
-			const element = document.getElementById(this.props.id);
-			if (element) element.style.display = 'none';
-		}
-	}
-
-	onClose() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onClose !== undefined) {
-			this.state.onClose();
-		}
-	}
-
-	onAccept() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onAccept !== undefined) {
-			this.state.onAccept();
-		}
-	}
-
-	onDecline() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onDecline !== undefined) {
-			this.state.onDecline();
-		}
-	}
+	onDecline() { super.onDecline(); }
 
 	render() {
 		return (
@@ -349,76 +311,15 @@ class Confirm extends React.Component {
 }
 
 class Input extends React.Component {
-	constructor(props) {
-		super(props);
-		autobind(this);
+	addTransitions() { super.addTransitions(); }
 
-		this.state = props.options;
-		this.state.inputValue = '';
-		this.closeTimeout = null;
+	componentWillUnmount() { super.componentWillUnmount(); }
 
-		this.preTransitionStyle = new Map();
+	onClose() { super.onClose(); }
 
-		this.transitionStartTimeout = null;
-		this.transitionStopTimeout = null;
+	onAccept(val) { super.onAccept(val); }
 
-		if (this.state.time !== 0) {
-			this.closeTimeout = setTimeout(() => {
-				this.onClose(); 
-			}, this.state.time);
-		}
-
-		if (this.state.transition) {
-			this.transitionStartTimeout = setTimeout(() => {
-				const pop = document.querySelector('.input');
-				const currentStyle = this.state.style == null ? { } : { ...this.state.style };
-				const totalStyle = mergeObject(currentStyle, this.state.transition.style);
-
-				Object.entries(totalStyle).forEach(([key, value]) => {
-					this.preTransitionStyle.set(key, pop.style[key]);
-					pop.style[key] = value;
-				});
-			}, 100);
-
-			if (this.state.transition.time !== 0) {
-				this.transitionStopTimeout = setTimeout(() => {
-					const pop = document.querySelector('.input');
-					this.preTransitionStyle.forEach((val, key) => {
-						pop.style[key] = val;
-					});
-				}, this.state.transition.time);
-			} 
-		}
-	}
-
-	componentWillUnmount() {
-		if (this.closeTimeout) {
-			clearTimeout(this.closeTimeout);
-			const element = document.getElementById(this.props.id);
-			if (element) element.style.display = 'none';
-		}
-	}
-
-	onClose() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onClose !== undefined) {
-			this.state.onClose();
-		}
-	}
-
-	onAccept() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onAccept !== undefined) {
-			this.state.onAccept(this.state.inputValue);
-		}
-	}
-
-	onDecline() {
-		this.setState({ style: { display: 'none' }});
-		if (this.state.onDecline !== undefined) {
-			this.state.onDecline(this.state.inputValue);
-		}
-	}
+	onDecline() { super.onDecline(); }
 
 	onChange(e) {
 		this.setState({ inputValue: e.target.value });
@@ -436,7 +337,7 @@ class Input extends React.Component {
 					<input type="text" onChange={this.onChange} value={this.state.inputValue}></input>
 				</div>
 				<div className="buttons">
-					<button className="acceptButton" onClick={this.onAccept}>{this.state.accept}</button>
+					<button className="acceptButton" onClick={() => this.onAccept(this.state.inputValue)}>{this.state.accept}</button>
 					<button className="declineButton" onClick={this.onDecline}>{this.state.decline}</button>
 				</div>
 			</div>

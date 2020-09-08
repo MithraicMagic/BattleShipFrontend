@@ -18,8 +18,6 @@ class Main extends Component {
     }
 
     componentDidMount() {
-        const joinCode = new URL(window.location.href).searchParams.get('code');
-
         socket.onStateSwitch = () => { this.forceUpdate(); }
 
         socket.emit('getNameData', socket.uid);
@@ -30,6 +28,7 @@ class Main extends Component {
             });
         });
         
+        const joinCode = new URL(window.location.href).searchParams.get('code');
         if (joinCode != null) {
             socket.emit('getLobbyInfo', joinCode)
         }
