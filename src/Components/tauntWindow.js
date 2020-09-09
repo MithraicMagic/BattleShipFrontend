@@ -49,8 +49,7 @@ export default class tauntWindow extends Component {
             RensAlert.popup({ 
                 title: `Message from ${socket.opponent}`,
                 text: m.message,
-                ...MESSAGE_STYLE
-            });
+            }, ...MESSAGE_STYLE);
             const messages = this.state.messages;
             messages.push(<Message key={"r" + Math.random()} message={m.message} time={m.time} sent={false}/>);
 
