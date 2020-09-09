@@ -27,7 +27,7 @@ class Setup extends Component {
     }
 
     componentDidMount() {
-        socket.onStateSwitch = () => { 
+        socket.onStateSwitch = () => {
             if (socket.state === "OpponentReconnecting") {
                 rensAlert.popup({
                     title: "Oh Noes!",
@@ -35,7 +35,7 @@ class Setup extends Component {
                 });
                 return;
             }
-            this.forceUpdate(); 
+            this.forceUpdate();
         }
 
         socket.emit('getSetupData', socket.uid);
@@ -86,8 +86,10 @@ class Setup extends Component {
         });
 
         socket.on('opponentSubmitted', () => {
-            rensAlert.popup({ title: 'Hurry up!', text: 'Your opponent is ready' });
-            this.setState({opponentReady: true});
+            if (socket.state !== "SetupComplete") {
+                rensAlert.popup({ title: 'Hurry up!', text: 'Your opponent is ready' });
+            }
+            this.setState({ opponentReady: true });
         });
 
         socket.on('gameStarted', () => {
@@ -292,9 +294,9 @@ class Setup extends Component {
             this.removeBoatFromGrid(boat);
         });
 
-        this.setState({availableBoats: [...this.state.availableBoats, ...this.state.setBoats], setBoats: []});
+        this.setState({ availableBoats: [...this.state.availableBoats, ...this.state.setBoats], setBoats: [] });
 
-        rensAlert.popup({title: "Cleared Grid", text: "Your grid has been cleared!" });
+        rensAlert.popup({ title: "Cleared Grid", text: "Your grid has been cleared!" });
     }
 
     submitSetup() {
@@ -302,7 +304,7 @@ class Setup extends Component {
             socket.emit('submitSetup', { lobbyId: this.state.lobbyId, uid: socket.uid });
             document.getElementById('sub-btn').disabled = true;
         } else {
-            rensAlert.popup({title: 'WHOA!', text: 'You have to place all of your ships before submitting!' });
+            rensAlert.popup({ title: 'WHOA!', text: 'You have to place all of your ships before submitting!' });
         }
     }
 
@@ -310,7 +312,7 @@ class Setup extends Component {
         if (this.state.availableBoats.length > 0) {
             socket.emit('autoPlaceShips', {
                 lobbyId: this.state.lobbyId,
-                uid: socket.uid 
+                uid: socket.uid
             });
         }
         else {
@@ -366,7 +368,7 @@ class Setup extends Component {
     getOverlayContent() {
         return (
             <div>
-                <h1>Waiting for {this.state.otherUsername}... {this.state.opponentReady ? '✅' : '⛔'}</h1>
+                {this.state.opponentReady ? <h1>{this.state.otherUsername} is ready! <span role="img" aria-label="Done">✅</span></h1> : <h1>Waiting for {this.state.otherUsername}...<span role="img" aria-label="Waiting">⛔</span></h1>}
             </div>
         )
     }
