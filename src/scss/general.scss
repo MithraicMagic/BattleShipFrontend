@@ -37,7 +37,7 @@ body {
         }
     }
 
-    button {
+    button, input[type=submit] {
         border: none;
         color: white;
         padding: 10px 20px;
@@ -87,4 +87,17 @@ body {
             border: 1px solid darken($beau-blue, 15);
         }
     }
+}
+
+*::-webkit-scrollbar {
+    width: 14px;
+}
+
+*::-webkit-scrollbar-track {
+    background: darken($dark-blue-gray, 13);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: $red-crayola;
+    border-radius: 14px;
 }

@@ -4,12 +4,12 @@ import RensAlert from '../rensAlert/rensAlert';
 
 import '../scss/taunt.scss';
 import autobind from 'class-autobind';
-import { DEFAULT_STYLE, MESSAGE_STYLE } from '../rensAlertStyles';
+import { MESSAGE_STYLE } from '../rensAlertStyles';
 import socket from '../socket';
 import Message from './Message';
 
 const State = { DOWN: 0, UP: 1 };
-const InvisibleStates = [ "None", "EnterName", "Available" ];
+const InvisibleStates = [ "None", "EnterName", "Available", "Settings" ];
 
 function buildDate(time) {
     const d = new Date();
@@ -37,11 +37,8 @@ export default class tauntWindow extends Component {
 
         socket.socket.on('messages', (data) => {
             const messages = [];
-            data.sent.forEach((m, index) => {
-                messages.push(<Message key={"s" + index} message={m.message} time={m.time} sent={true}/>);
-            });
-            data.received.forEach((m, index) => {
-                messages.push(<Message key={"r" + index} message={m.message} time={m.time} sent={false}/>);
+            data.forEach((m, index) => {
+                messages.push(<Message key={index} message={m.message} time={m.time} sent={socket.username === m.sender}/>);
             });
             
             messages.sort((a, b) => buildDate(a.props.time) - buildDate(b.props.time));
@@ -56,8 +53,20 @@ export default class tauntWindow extends Component {
             });
             const messages = this.state.messages;
             messages.push(<Message key={"r" + Math.random()} message={m.message} time={m.time} sent={false}/>);
-            this.setState({ messages });
+
+            this.onAddMessage(messages);
         });
+    }
+
+    onAddMessage(messages) {
+        if (messages.length > 20) messages.splice(0, 1);
+
+        this.setState({ messages }, () => this.scrollDown());
+    }
+
+    scrollDown() {
+        const m = document.querySelector('.messages');
+        m.scrollTop = m.scrollHeight;
     }
 
     onStateSwitch() {
@@ -90,7 +99,6 @@ export default class tauntWindow extends Component {
             RensAlert.popup({
                 title: 'Oops',
                 text: 'Your message should be between 3 and 100 characters',
-                ...DEFAULT_STYLE
             });
             return;
         } 
@@ -98,8 +106,9 @@ export default class tauntWindow extends Component {
         socket.emit('sendMessage', { lobbyId: this.props.lobbyId, uid: socket.uid, message: msg });
         const messages = this.state.messages;
         messages.push(<Message key={"s" + Math.random()} message={msg} time={new Date().toTimeString()} sent={true}/>);
-        this.setState({ messages });
+        
         textBox.value = "";
+        this.onAddMessage(messages);
     }
 
     render() {

@@ -31,62 +31,79 @@ const ModalType = {
 class RensAlert {
 	constructor() {
 		this.container = React.createRef();
+		this.defaultOptions = {};
 	}
 
-	popup(props) {
+	setDefaultOptions(options) {
+		this.defaultOptions = options;
+	}
+
+	popup(props, overrideOptions) {
 		const key = `popup${genRandomString()}`;
 
-		const mergedProps = mergeObject({
+		let mergedProps = mergeObject({
 			title: 'Popup',
 			text: 'Rens is super cool',
 			spawn: RensAlertSpawnType.REPLACE,
-			type: ModalType.POPUP
+			type: ModalType.POPUP,
+			time: 0
 		}, props);
+		const options = overrideOptions ? overrideOptions : this.defaultOptions;
 
+		mergedProps = mergeObject(mergedProps, options);
 		this.container.current.addModal(<Popup key={key} id={key} options={mergedProps} onClose={this.container.current.onClose}/>, mergedProps);
 	}
 
-	accept(props) {
+	accept(props, overrideOptions) {
 		const key = `accept${genRandomString()}`;
 
-		const mergedProps = mergeObject({
+		let mergedProps = mergeObject({
 			title: 'Accept',
 			text: 'Rens is nog steeds super cool',
 			accept: 'Ok',
 			spawn: RensAlertSpawnType.REPLACE,
-			type: ModalType.ACCEPT
+			type: ModalType.ACCEPT,
+			time: 0
 		}, props);
+		const options = overrideOptions ? overrideOptions : this.defaultOptions;
 
+		mergedProps = mergeObject(mergedProps, options);
 		this.container.current.addModal(<Accept key={key} id={key} options={mergedProps} onClose={this.container.current.onClose}/>, mergedProps);
 	}
 
-	confirm(props) {
+	confirm(props, overrideOptions) {
 		const key = `confirm${genRandomString()}`;
 
-		const mergedProps = mergeObject({
+		let mergedProps = mergeObject({
 			title: 'Confirm',
 			text: 'Rens is BEST',
 			accept: 'Accept',
 			decline: 'Decline',
 			spawn: RensAlertSpawnType.REPLACE,
-			type: ModalType.CONFIRM
+			type: ModalType.CONFIRM,
+			time: 0
 		}, props);
+		const options = overrideOptions ? overrideOptions : this.defaultOptions;
 
+		mergedProps = mergeObject(mergedProps, options);
 		this.container.current.addModal(<Confirm key={key} id={key} options={mergedProps} onClose={this.container.current.onClose}/>, mergedProps);
 	}
 
-	input(props) {
+	input(props, overrideOptions) {
 		const key = `input${genRandomString()}`;
 
-		const mergedProps = mergeObject({
+		let mergedProps = mergeObject({
 			title: 'Input',
 			text: 'Rens is BEST!!',
 			accept: 'Accept',
 			decline: 'Decline',
 			spawn: RensAlertSpawnType.REPLACE,
-			type: ModalType.INPUT
+			type: ModalType.INPUT,
+			time: 0
 		}, props);
+		const options = overrideOptions ? overrideOptions : this.defaultOptions;
 
+		mergedProps = mergeObject(mergedProps, options);
 		this.container.current.addModal(<Input key={key} id={key} options={mergedProps} onClose={this.container.current.onClose}/>, mergedProps);
 	}
 }

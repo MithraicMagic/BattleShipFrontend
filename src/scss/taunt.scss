@@ -32,6 +32,10 @@
         span {
             margin: auto;
         }
+
+        &:hover {
+            background-color: darken($red-crayola, 5);
+        }
     }
 
     .open {
@@ -46,12 +50,17 @@
         span {
             margin: auto;
         }
+
+        &:hover {
+            background-color: darken($dark-blue-gray, 10);
+        }
     }
 
     .messages {
         display: none;
         margin: 50px auto 0 auto;
         width: 95%;
+        overflow-y: auto;
 
         .message {
             padding: 5px 10px;

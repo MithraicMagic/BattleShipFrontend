@@ -5,7 +5,7 @@ import Grid from '../Components/Grid';
 import autobind from 'class-autobind';
 import '../scss/game.scss';
 import rensAlert from '../rensAlert/rensAlert';
-import { DEFAULT_STYLE, NON_TIMED } from '../rensAlertStyles';
+import { NON_TIMED } from '../rensAlertStyles';
 
 export default class Game extends Component {
     constructor(props) {
@@ -26,7 +26,6 @@ export default class Game extends Component {
                 rensAlert.popup({
                     title: "Oh Noes!",
                     text: "Your opponent is reconnecting... 😰",
-                    ...DEFAULT_STYLE
                 });
                 return;
             }
@@ -56,13 +55,13 @@ export default class Game extends Component {
             if (data.hitShip) {
                 this.registerShot(true, true, data.pos);
                 if (data.destroyedShip) {
-                    rensAlert.popup({title: 'WOOHOO!', text: 'You hit and destroyed a ship! 🔥🚢🔥', ...DEFAULT_STYLE});
+                    rensAlert.popup({title: 'WOOHOO!', text: 'You hit and destroyed a ship! 🔥🚢🔥' });
                     return;
                 }
-                rensAlert.popup({title: 'Yay!', text:'You hit a ship! 🔥🚢', ...DEFAULT_STYLE})
+                rensAlert.popup({title: 'Yay!', text:'You hit a ship! 🔥🚢' })
             } else {
                 this.registerShot(true, false, data.pos);
-                rensAlert.popup({title: 'Aww...', text:'You missed 😢', ...DEFAULT_STYLE});              
+                rensAlert.popup({title: 'Aww...', text:'You missed 😢' });              
             }
         });
 
@@ -70,13 +69,13 @@ export default class Game extends Component {
             if (data.hitShip) {
                 this.registerShot(false, true, data.pos);
                 if (data.destroyedShip) {
-                    rensAlert.popup({title: 'OH MY FUKCING GOD! JESUS CHRIST!', text: 'One of your ships was hit and destroyed! 😭', ...DEFAULT_STYLE});
+                    rensAlert.popup({title: 'OH MY FUKCING GOD! JESUS CHRIST!', text: 'One of your ships was hit and destroyed! 😭' });
                     return;
                 }
-                rensAlert.popup({title: 'Oh no!', text:'One of your ships was hit.. 😢', ...DEFAULT_STYLE})
+                rensAlert.popup({title: 'Oh no!', text:'One of your ships was hit.. 😢' })
             } else {
                 this.registerShot(false, false, data.pos);
-                rensAlert.popup({title: 'Hehehe', text:'Your opponent missed! 😈', ...DEFAULT_STYLE})
+                rensAlert.popup({title: 'Hehehe', text:'Your opponent missed! 😈' })
             }
         });
 
@@ -91,8 +90,8 @@ export default class Game extends Component {
         socket.on('opponentLeft', () => {
             rensAlert.accept({
                 title: "Oh no!", text: "Your opponent has disconnected 😭", accept: 'Okay :(',
-                onAccept: () => this.props.history.push('/'), ...NON_TIMED
-            });
+                onAccept: () => this.props.history.push('/')
+            }, NON_TIMED);
         });
     }
 

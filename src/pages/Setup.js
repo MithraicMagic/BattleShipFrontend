@@ -3,11 +3,12 @@ import socket from '../socket';
 import rensAlert from '../rensAlert/rensAlert';
 import '../scss/setup.scss';
 import Boat, { BOATTYPE, BOATDATA } from '../Components/Boat';
+
 import Grid from '../Components/Grid';
 import autobind from 'class-autobind';
 import { withRouter } from 'react-router-dom';
 
-import { DEFAULT_STYLE, NON_TIMED } from '../rensAlertStyles';
+import { NON_TIMED } from '../rensAlertStyles';
 
 class Setup extends Component {
     constructor(props) {
@@ -31,7 +32,6 @@ class Setup extends Component {
                 rensAlert.popup({
                     title: "Oh Noes!",
                     text: "Your opponent is reconnecting... 😰",
-                    ...DEFAULT_STYLE
                 });
                 return;
             }
@@ -51,13 +51,17 @@ class Setup extends Component {
 
         socket.on('autoPlaceShipsAccepted', data => {
             this.placeBoats(data);
+            rensAlert.popup({
+                title: 'Yay',
+                text: 'Your ships have been automatically placed on the board'
+            });
         });
 
         socket.on('opponentLeft', () => {
             rensAlert.accept({
                 title: "Oh no!", text: "Your opponent has disconnected 😭", accept: 'Okay :(',
-                onAccept: () => this.props.history.push('/'), ...NON_TIMED
-            });
+                onAccept: () => this.props.history.push('/')
+            }, NON_TIMED);
         });
 
         socket.on('lobbyLeft', () => {
@@ -69,7 +73,7 @@ class Setup extends Component {
                 this.state.pendingBoat.element.classList.remove('placed');
             }
             if (data.event === 'submitSetup') {
-                rensAlert.popup({ title: 'LOOOOLLL DOM EN SLECHT 👨🏼‍🦳', text: 'JE DACHT IK DOE DIT EVEN SNEL, MAAR NEE, JE IQ IS VEEEEEEL TE LAAG (doe je setup even opnieuw)', ...DEFAULT_STYLE });
+                rensAlert.popup({ title: 'LOOOOLLL DOM EN SLECHT 👨🏼‍🦳', text: 'JE DACHT IK DOE DIT EVEN SNEL, MAAR NEE, JE IQ IS VEEEEEEL TE LAAG (doe je setup even opnieuw)' });
                 document.getElementById('sub-btn').disabled = false;
             }
 
@@ -82,7 +86,7 @@ class Setup extends Component {
         });
 
         socket.on('opponentSubmitted', () => {
-            rensAlert.popup({ title: 'Shoot up!', text: 'Your opponent is ready', ...DEFAULT_STYLE });
+            rensAlert.popup({ title: 'Hurry up!', text: 'Your opponent is ready' });
             this.setState({opponentReady: true});
         });
 
@@ -280,7 +284,7 @@ class Setup extends Component {
 
     clearBoats() {
         if (this.state.setBoats.length < 1) {
-            rensAlert.popup({ title: "Cleared Grid", text: "There were no boats on the grid though", ...DEFAULT_STYLE });
+            rensAlert.popup({ title: "Cleared Grid", text: "There were no boats on the grid though" });
             return;
         }
 
@@ -290,7 +294,7 @@ class Setup extends Component {
 
         this.setState({availableBoats: [...this.state.availableBoats, ...this.state.setBoats], setBoats: []});
 
-        rensAlert.popup({title: "Cleared Grid", text: "Your grid has been cleared!", ...DEFAULT_STYLE});
+        rensAlert.popup({title: "Cleared Grid", text: "Your grid has been cleared!" });
     }
 
     submitSetup() {
@@ -298,15 +302,23 @@ class Setup extends Component {
             socket.emit('submitSetup', { lobbyId: this.state.lobbyId, uid: socket.uid });
             document.getElementById('sub-btn').disabled = true;
         } else {
-            rensAlert.popup({title: 'WHOA!', text: 'You have to place all of your ships before submitting!', ...DEFAULT_STYLE});
+            rensAlert.popup({title: 'WHOA!', text: 'You have to place all of your ships before submitting!' });
         }
     }
 
     autoPlace() {
-        socket.emit('autoPlaceShips', {
-            lobbyId: this.state.lobbyId,
-            uid: socket.uid 
-        });
+        if (this.state.availableBoats.length > 0) {
+            socket.emit('autoPlaceShips', {
+                lobbyId: this.state.lobbyId,
+                uid: socket.uid 
+            });
+        }
+        else {
+            rensAlert.popup({
+                title: "Oopsie",
+                text: 'All your boats are already on the board.'
+            });
+        }
     }
 
     getCurrentView() {

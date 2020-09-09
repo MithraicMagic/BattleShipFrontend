@@ -6,8 +6,6 @@ import autobind from 'class-autobind';
 import rensalert from '../rensAlert/rensAlert';
 import { withRouter } from 'react-router-dom';
 
-import { DEFAULT_STYLE } from '../rensAlertStyles';
-
 class Main extends Component {
     constructor(props) {
         super(props);
@@ -18,7 +16,13 @@ class Main extends Component {
     }
 
     componentDidMount() {
-        socket.onStateSwitch = () => { this.forceUpdate(); }
+        socket.onStateSwitch = () => { 
+            if (socket.state === "Settings") {
+                this.props.history.push('/settings');
+                return;
+            }
+            this.forceUpdate(); 
+        }
 
         socket.emit('getNameData', socket.uid);
         socket.on('nameData', (data) => {
@@ -71,7 +75,6 @@ class Main extends Component {
             rensalert.popup({ 
                 title: "Oh no!", 
                 text: "Your opponent has disconnected 😭", 
-                ...DEFAULT_STYLE
             });
         });
 
@@ -89,7 +92,6 @@ class Main extends Component {
             rensalert.popup({ 
                 title: 'Oopsie!', 
                 text: 'Please enter a username that is longer than 4 characters', 
-                ...DEFAULT_STYLE
             });
             return;
         }
@@ -97,7 +99,6 @@ class Main extends Component {
             rensalert.popup({ 
                 title: 'Oopsie!',
                 text: 'Please enter a username that is shorter than 20 characters', 
-                ...DEFAULT_STYLE
             });
             return;
         }
@@ -110,6 +111,10 @@ class Main extends Component {
 
     emitStart() {
         socket.emit('startSetup', this.state.lobbyId);
+    }
+
+    playSinglePlayer() {
+        socket.emit('singlePlayerSettings', socket.uid);
     }
 
     async onCodeClick() {
@@ -144,9 +149,11 @@ class Main extends Component {
                                 Your code is: <span className="code" onClick={this.onCodeClick}>{this.state.playerCode}</span>
                                 <div className="copyPopup"><p>Code copied to clipboard</p></div>
                             </h2>
+
+                            <button className="singlePlayer" onClick={this.playSinglePlayer}>Singleplayer</button>
                         </div>
                         <div>
-                            <h2>Enter a friend's code here</h2>
+                            <h2>Or enter a friend's code here</h2>
                             <input type="text" id="code" autoComplete="off" onKeyDown={(k) => k.key === 'Enter' ? this.tryCode() : null}></input>
                             <button onClick={this.tryCode}>Try Code</button>
                         </div>

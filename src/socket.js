@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 import RensAlert from './rensAlert/rensAlert';
-import { NON_TIMED, DEFAULT_STYLE } from './rensAlertStyles';
+import { NON_TIMED } from './rensAlertStyles';
 
 class Socket {
     constructor() {
@@ -23,12 +23,13 @@ class Socket {
 
         this.socket.on('message');
         this.socket.on('errorEvent', (data) => {
-            console.log('AARDAPPEL');
+            if (process.env.REACT_APP_CATCH_ERROR_EVENTS === 'true') {
+                console.log(`[ErrorEvent Received: ${data.event} ${data.reason}]`);
+            }
 
             RensAlert.popup({
                 title: 'Oopsie!',
                 text: data.reason,
-                ...DEFAULT_STYLE
             });
         });
 
@@ -36,11 +37,14 @@ class Socket {
             RensAlert.popup({
                 title: 'Yay!',
                 text: 'Your opponent is back!',
-                ...DEFAULT_STYLE
             });
         });
 
         this.socket.on('playerState', (state) => {
+            if (process.env.REACT_APP_CATCH_PLAYERSTATE_EVENTS === 'true') {
+                console.log(`[PlayerState Received: ${state}]`);
+            }
+
             this.state = state;
             if (this.onStateSwitch) this.onStateSwitch();
             if (this.onStateSwitchTaunt) this.onStateSwitchTaunt();
@@ -92,8 +96,8 @@ class Socket {
             decline: "No",
             onAccept: () => {
                 this.socket.emit('leaveLobby', { uid: this.uid, lobbyId });
-            }, ...NON_TIMED
-        });
+            },
+        }, NON_TIMED);
     }
 
     removeListeners() {
