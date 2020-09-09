@@ -27,12 +27,6 @@
                 max-width: 250px;
             }
 
-            &[type=number] {
-                height: 35px;
-                max-width: 150px;
-                border: none;
-            }
-
             &[type=submit] {
                 max-width: 200px;
                 margin-top: 5vh;
@@ -54,7 +48,7 @@
             height: 25px;
             width: 50px;
             background: $red-crayola;
-            border-radius: 10px;
+            cursor: pointer;
     
             &:hover {
                 background: darken($red-crayola, 4);
