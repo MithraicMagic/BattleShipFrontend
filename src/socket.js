@@ -21,7 +21,6 @@ class Socket {
     init() {
         this.socket.on('newUid', (data) => sessionStorage.setItem('userId', data.data));
 
-        this.socket.on('message');
         this.socket.on('errorEvent', (data) => {
             if (process.env.REACT_APP_CATCH_ERROR_EVENTS === 'true') {
                 console.log(`[ErrorEvent Received: ${data.event} ${data.reason}]`);
@@ -40,17 +39,17 @@ class Socket {
             });
         });
 
-        this.socket.on('playerState', (state) => {
+        this.socket.on('playerState', (data) => {
             if (process.env.REACT_APP_CATCH_PLAYERSTATE_EVENTS === 'true') {
-                console.log(`[PlayerState Received: ${state}]`);
+                console.log(`[PlayerState Received: ${data.state}]`);
             }
 
-            this.state = state;
+            this.state = data.state;
             if (this.onStateSwitch) this.onStateSwitch();
             if (this.onStateSwitchTaunt) this.onStateSwitchTaunt();
         });
 
-        this.socket.emit('lastUid', this.uid);
+        this.socket.emit('lastUid', { uid: this.uid });
     }
 
     setUid(uid) {

@@ -37,7 +37,7 @@ export default class tauntWindow extends Component {
 
         socket.socket.on('messages', (data) => {
             const messages = [];
-            data.forEach((m, index) => {
+            data.messages.forEach((m, index) => {
                 messages.push(<Message key={index} message={m.message} time={m.time} sent={socket.username === m.sender}/>);
             });
             
@@ -46,10 +46,12 @@ export default class tauntWindow extends Component {
         });
 
         socket.socket.on('messageReceived', (m) => {
+            console.log(m, socket);
+
             RensAlert.popup({ 
                 title: `Message from ${socket.opponent}`,
                 text: m.message,
-            }, ...MESSAGE_STYLE);
+            }, MESSAGE_STYLE);
             const messages = this.state.messages;
             messages.push(<Message key={"r" + Math.random()} message={m.message} time={m.time} sent={false}/>);
 
@@ -76,7 +78,7 @@ export default class tauntWindow extends Component {
         else {
             tauntWindow.classList.remove('hidden');
             if (!this.state.getMessagesEmitted) {
-                socket.emit('getMessages', socket.uid);
+                socket.emit('getMessages', { uid: socket.uid });
                 this.setState({ getMessagesEmitted: true });
             }
         }

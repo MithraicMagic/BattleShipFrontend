@@ -38,7 +38,7 @@ class Setup extends Component {
             this.forceUpdate();
         }
 
-        socket.emit('getSetupData', socket.uid);
+        socket.emit('getSetupData', { uid: socket.uid });
         socket.on('setupData', (data) => {
             this.setState({
                 lobbyId: data.lobbyId,
@@ -49,8 +49,8 @@ class Setup extends Component {
             this.placeBoats(data.boatData);
         });
 
-        socket.on('autoPlaceShipsAccepted', data => {
-            this.placeBoats(data);
+        socket.on('autoPlaceShipsAccepted', (data) => {
+            this.placeBoats(data.ships);
             rensAlert.popup({
                 title: 'Yay',
                 text: 'Your ships have been automatically placed on the board'

@@ -24,7 +24,7 @@ class Main extends Component {
             this.forceUpdate(); 
         }
 
-        socket.emit('getNameData', socket.uid);
+        socket.emit('getNameData', { uid: socket.uid });
         socket.on('nameData', (data) => {
             this.setState({
                 playerCode: data.code,
@@ -36,8 +36,8 @@ class Main extends Component {
         if (joinCode != null) {
             socket.emit('getLobbyInfo', joinCode)
         }
-        socket.on('lobbyInfo', otherName => {
-            this.setState({otherName});
+        socket.on('lobbyInfo', (data) => {
+            this.setState({ otherName: data.name });
         });
 
         socket.on('nameAccepted', (data) => {
@@ -110,11 +110,11 @@ class Main extends Component {
     }
 
     emitStart() {
-        socket.emit('startSetup', this.state.lobbyId);
+        socket.emit('startSetup', { id: this.state.lobbyId });
     }
 
     playSinglePlayer() {
-        socket.emit('singlePlayerSettings', socket.uid);
+        socket.emit('singlePlayerSettings', { uid: socket.uid });
     }
 
     async onCodeClick() {

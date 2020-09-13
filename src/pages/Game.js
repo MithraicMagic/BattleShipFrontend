@@ -39,7 +39,7 @@ export default class Game extends Component {
             this.forceUpdate();
         }
 
-        socket.emit('getGameData', socket.uid)
+        socket.emit('getGameData', { uid: socket.uid })
         socket.on('gameData', (data) => {
             this.setState({
                 lobbyId: data.lobbyId,
@@ -51,7 +51,7 @@ export default class Game extends Component {
             this.setTiles(data.hitData, data.missData);
         });
 
-        socket.on('shotFired', data => {
+        socket.on('shotFired', (data) => {
             if (data.hitShip) {
                 this.registerShot(true, true, data.pos);
                 if (data.destroyedShip) {
@@ -65,7 +65,7 @@ export default class Game extends Component {
             }
         });
 
-        socket.on('gotShot', data => {
+        socket.on('gotShot', (data) => {
             if (data.hitShip) {
                 this.registerShot(false, true, data.pos);
                 if (data.destroyedShip) {

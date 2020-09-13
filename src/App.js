@@ -10,6 +10,7 @@ import Game from './pages/Game';
 import Settings from './pages/SingleplayerSettings';
 import TauntWindow from './Components/tauntWindow';
 import { DEFAULT_STYLE } from './rensAlertStyles';
+import Documentation from './pages/Documentation';
 
 export default class App extends Component {
   constructor(props) {
@@ -26,6 +27,7 @@ export default class App extends Component {
             <Route path={'/game'} component={Game} />
             <Route path={'/setup'} component={Setup} />
             <Route path={'/settings'} component={Settings} />
+            <Route path={'/documentation'} component={Documentation} />
             <Route path={'/'} component={Main} />
           </Switch>
         </Router>
