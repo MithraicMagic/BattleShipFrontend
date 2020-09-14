@@ -12,8 +12,6 @@ export default class DocFields extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props);
-
         const data = this.props.fields;
         const fields = [];
 
