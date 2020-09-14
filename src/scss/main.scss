@@ -16,6 +16,16 @@
         > * {
             margin: 5px 0;
         }
+
+        a {
+            position: absolute;
+            bottom: 5px;
+            color: white;
+
+            &:hover {
+                color: darken(white, 20);
+            }
+        }
     }
 
     .top {

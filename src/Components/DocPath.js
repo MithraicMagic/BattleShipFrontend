@@ -15,29 +15,38 @@ export default class DocPath extends Component {
     }
 
     componentDidMount() {
-        const inputs = <DocFields fields={this.props.doc.input.fields}/>;
-        const outputs = <DocFields fields={this.props.doc.output.fields}/>;
-        const onError = <DocFields fields={this.props.doc.onError.fields}/>
+        const inputs = <DocFields fields={this.props.doc.input.fields} />;
+        const outputs = <DocFields fields={this.props.doc.output.fields} />;
+        const onError = <DocFields fields={this.props.doc.onError.fields} />
 
         this.setState({ inputs, outputs, onError });
+    }
+
+    expand(e) {
+        document.querySelectorAll('.path').forEach(ele => {
+            if (ele !== e.currentTarget) {
+                ele.parentElement.classList.add('hidden');
+            }
+        });
+        e.currentTarget.parentElement.classList.toggle('hidden');
     }
 
     render() {
         return (
             <div className="event hidden">
-                <h3 className="path">{this.props.doc.path}</h3>
+                <h3 className="path" onClick={(e) => this.expand(e)}>{this.props.doc.path}</h3>
 
                 <div className="attributes">
                     <div className="inputs">
                         <h4>Expects</h4>
                         {this.state.inputs}
                     </div>
-                    <hr/>
+                    <hr />
                     <div className="outputs">
                         <h4>Returns</h4>
                         {this.state.outputs}
                     </div>
-                    <hr/>
+                    <hr />
                     <div className="errors">
                         <h4>OnError</h4>
                         {this.state.onError}

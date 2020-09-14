@@ -138,6 +138,7 @@ class Main extends Component {
                         {joinCode ? <h2>Enter a username to join {this.state.otherName}'s lobby!</h2> : <h2>Enter your desired username!</h2>}
                         <input type="text" id="username" autoComplete="off" data-lpignore="true" onKeyDown={(k) => k.key === 'Enter' ? this.submitUsername() : null}></input>
                         <button onClick={this.submitUsername}>Submit</button>
+                        <a href={'/documentation'}>API Documentation</a>
                     </div>
                 );
             case "Available":

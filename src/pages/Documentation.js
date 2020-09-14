@@ -8,7 +8,9 @@ export default class Documentation extends Component {
         super(props);
 
         this.state = {
-            paths: []
+            socketPaths: [],
+            apiPaths: [],
+            socketApi: true
         };
     }
 
@@ -19,30 +21,36 @@ export default class Documentation extends Component {
 
             const paths = [];
             docs.forEach((p, i) => {
-                paths.push(<DocPath key={i} doc={p}/>)
+                paths.push(<DocPath key={i} doc={p} />)
             });
 
-            this.setState({ paths });
+            this.setState({ socketPaths: paths });
         }
+    }
 
-        const elements = document.querySelectorAll('.event');
-        elements.forEach(el => {
-            el.addEventListener('click', (e) => {
-                elements.forEach(ele => {
-                    if (ele !== el) {
-                        ele.classList.add('hidden');
-                    }
-                });
-                e.currentTarget.classList.toggle('hidden');
-            });
-        });
+    getContent() {
+        if (this.state.socketApi) {
+            return this.state.socketPaths;
+        } else {
+            return this.state.apiPaths;
+        }
     }
 
     render() {
         return (
             <div className="documentation">
+                <div className="header">
+                    <div className="back-button-container">
+                        <div className="back-button" onClick={() => this.props.history.push('/')}><div></div></div>
+                    </div>
+                    <div className="buttons">
+                        <button className={this.state.socketApi ? 'active' : ''} onClick={() => this.setState({ socketApi: true })}>Sockets<div></div></button>
+                        <button className={this.state.socketApi ? '' : 'active'} onClick={() => this.setState({ socketApi: false })}>REST<div></div></button>
+                    </div>
+                    <div></div>
+                </div>
                 <div className="events">
-                    {this.state.paths}
+                    {this.getContent()}
                 </div>
             </div>
         )
