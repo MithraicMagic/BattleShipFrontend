@@ -1,0 +1,102 @@
+@import 'colors.scss';
+
+.documentation {
+    display: flex;
+    justify-content: center;
+
+    * {
+        user-select: none;
+    }
+
+    .events {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        width: 60%;
+        background: darken($dark-blue-gray, 10);
+        border-radius: 0px;
+
+        .event {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            width: 90%;
+            margin: 10px 0;
+
+            h3 {
+                width: 100%;
+                display: block;
+                padding: 15px 10px;
+                background: rgba($beau-blue, 0.3);
+                border: solid 2px $beau-blue;
+                cursor: pointer;
+            }
+
+            > .attributes {
+                visibility: hidden;
+                max-height: 0;
+                opacity: 0;
+                overflow: hidden;
+                transition: opacity, max-height 1s;
+            }
+        }
+
+        .expanded {
+            > .attributes {
+                display: flex;
+                flex-direction: column;
+                padding: 6px 10px;
+                width: 98%;
+                border-radius: 0;
+                background: darken($dark-blue-gray, 15);
+                visibility: visible;
+                max-height: 300px;
+                opacity: 1;
+                overflow: auto;
+
+                hr {
+                    align-self: center;
+                    width: 90%;
+                    margin: 20px 0;
+                }
+
+                h4 {
+                    margin: 0 0 5px 0;
+                }
+
+                .fields {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+
+                    .field {
+                        width: 100%;
+                        padding: 2px 5px;
+                        display: flex;
+                        border-radius: 0;
+
+                        > * {
+                            border-radius: 0;
+                        }
+
+                        .type, .name {
+                            flex: 1;
+                        }
+
+                        .description {
+                            flex: 4;
+                        }
+                    }
+
+                    .field:nth-child(odd) {
+                        background: darken($dark-blue-gray, 25);
+                    }
+
+                    .field:nth-child(even) {
+                        background: darken($dark-blue-gray, 18);
+                    }
+                }
+            }
+        }
+    }    
+}

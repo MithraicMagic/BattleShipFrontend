@@ -4,7 +4,7 @@ import { NON_TIMED } from './rensAlertStyles';
 
 class Socket {
     constructor() {
-        this.socket = io(process.env.REACT_APP_URL, { path: '/sockets' });
+        this.socket = io(process.env.REACT_APP_SOCKET_URL, { path: '/sockets' });
         this.uid = sessionStorage.getItem('userId');
         
         this.state = "EnterName";

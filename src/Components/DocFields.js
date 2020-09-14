@@ -25,7 +25,7 @@ export default class DocFields extends Component {
     render() {
         return (
             <div className="fields">
-                &#123; {this.state.fields} &#125;
+                {this.state.fields}
             </div>
         )
     }

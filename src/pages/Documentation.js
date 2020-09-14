@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react'
 import DocPath from '../Components/DocPath';
+import '../scss/documentation.scss';
 
 export default class Documentation extends Component {
     constructor(props) {
@@ -25,12 +26,24 @@ export default class Documentation extends Component {
 
             this.setState({ paths });
         }
+
+        const elements = document.querySelectorAll('.path');
+        elements.forEach(el => {
+            el.addEventListener('click', (e) => {
+                elements.forEach(ele => {
+                    ele.parentElement.classList.remove('expanded');
+                });
+                e.currentTarget.parentElement.classList.add('expanded');
+            });
+        });
     }
 
     render() {
         return (
-            <div className="docs">
-                {this.state.paths}
+            <div className="documentation">
+                <div className="events">
+                    {this.state.paths}
+                </div>
             </div>
         )
     }

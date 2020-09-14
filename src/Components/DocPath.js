@@ -27,19 +27,21 @@ export default class DocPath extends Component {
             <div className="event">
                 <h3 className="path">{this.props.doc.path}</h3>
 
-                <div className="inputs">
-                    <h4>Inputs</h4>
-                    {this.state.inputs}
-                </div>
-
-                <div className="outputs">
-                    <h4>Returns</h4>
-                    {this.state.outputs}
-                </div>
-
-                <div className="errors">
-                    <h4>OnError</h4>
-                    {this.state.onError}
+                <div className="attributes">
+                    <div className="inputs">
+                        <h4>Expects</h4>
+                        {this.state.inputs}
+                    </div>
+                    <hr/>
+                    <div className="outputs">
+                        <h4>Returns</h4>
+                        {this.state.outputs}
+                    </div>
+                    <hr/>
+                    <div className="errors">
+                        <h4>OnError</h4>
+                        {this.state.onError}
+                    </div>
                 </div>
             </div>
         )
