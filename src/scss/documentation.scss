@@ -21,7 +21,7 @@
             align-items: center;
             flex-direction: column;
             width: 90%;
-            margin: 10px 0;
+            margin: 5px 0;
 
             h3 {
                 width: 100%;
@@ -32,17 +32,7 @@
                 cursor: pointer;
             }
 
-            > .attributes {
-                visibility: hidden;
-                max-height: 0;
-                opacity: 0;
-                overflow: hidden;
-                transition: opacity, max-height 1s;
-            }
-        }
-
-        .expanded {
-            > .attributes {
+            >.attributes {
                 display: flex;
                 flex-direction: column;
                 padding: 6px 10px;
@@ -53,6 +43,7 @@
                 max-height: 300px;
                 opacity: 1;
                 overflow: auto;
+                transition: padding 1s, visibility 1s, opacity 1s, max-height 1s;
 
                 hr {
                     align-self: center;
@@ -75,11 +66,12 @@
                         display: flex;
                         border-radius: 0;
 
-                        > * {
+                        >* {
                             border-radius: 0;
                         }
 
-                        .type, .name {
+                        .type,
+                        .name {
                             flex: 1;
                         }
 
@@ -96,6 +88,16 @@
                         background: darken($dark-blue-gray, 18);
                     }
                 }
+            }
+        }
+
+        .hidden {
+            > .attributes {
+                visibility: hidden;
+                max-height: 0;
+                opacity: 0;
+                overflow: hidden;
+                padding: 0 10px;
             }
         }
     }    

@@ -25,13 +25,15 @@ export default class Documentation extends Component {
             this.setState({ paths });
         }
 
-        const elements = document.querySelectorAll('.path');
+        const elements = document.querySelectorAll('.event');
         elements.forEach(el => {
             el.addEventListener('click', (e) => {
                 elements.forEach(ele => {
-                    ele.parentElement.classList.remove('expanded');
+                    if (ele !== el) {
+                        ele.classList.add('hidden');
+                    }
                 });
-                e.currentTarget.parentElement.classList.add('expanded');
+                e.currentTarget.classList.toggle('hidden');
             });
         });
     }

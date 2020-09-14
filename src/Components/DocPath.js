@@ -24,7 +24,7 @@ export default class DocPath extends Component {
 
     render() {
         return (
-            <div className="event">
+            <div className="event hidden">
                 <h3 className="path">{this.props.doc.path}</h3>
 
                 <div className="attributes">
