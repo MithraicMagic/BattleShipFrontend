@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react'
-import DocPath from '../Components/DocPath';
+import RestDocBasePath from '../Components/RestDocBasePath';
+import SocketDocPath from '../Components/SocketDocPath';
 import '../scss/documentation.scss';
 
 export default class Documentation extends Component {
@@ -15,16 +16,28 @@ export default class Documentation extends Component {
     }
 
     async componentDidMount() {
-        const result = await fetch(process.env.REACT_APP_API_URL + '/documentation');
-        if (result.ok) {
-            const docs = await result.json();
+        const socketResult = await fetch(process.env.REACT_APP_API_URL + '/documentation/sockets');
+        if (socketResult.ok) {
+            const docs = await socketResult.json();
 
             const paths = [];
-            docs.forEach((p, i) => {
-                paths.push(<DocPath key={i} doc={p} />)
+            docs.entries.forEach((p, i) => {
+                paths.push(<SocketDocPath key={i} doc={p} />)
             });
 
             this.setState({ socketPaths: paths });
+        }
+
+        const apiResult = await fetch(process.env.REACT_APP_API_URL + '/documentation/rest');
+        if (apiResult.ok) {
+            const docs = await apiResult.json();
+
+            const paths = [];
+            docs.entries.forEach((p, i) => {
+                paths.push(<RestDocBasePath key={i} doc={p} />);
+            })
+
+            this.setState({ apiPaths: paths });
         }
     }
 

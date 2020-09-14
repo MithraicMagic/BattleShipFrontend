@@ -2,13 +2,13 @@
 import autobind from 'class-autobind';
 import React, { Component } from 'react'
 
-import DocFields from '../Components/DocFields';
+import DocFields from './DocFields';
 
-export default class DocPath extends Component {
+export default class SocketDocPath extends Component {
     constructor(props) {
         super(props);
+        
         autobind(this);
-
         this.state = {
             inputs: [], outputs: [], onError: []
         };
