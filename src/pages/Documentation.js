@@ -62,7 +62,7 @@ export default class Documentation extends Component {
                     </div>
                     <div></div>
                 </div>
-                <div className="events">
+                <div className="entries">
                     {this.getContent()}
                 </div>
             </div>

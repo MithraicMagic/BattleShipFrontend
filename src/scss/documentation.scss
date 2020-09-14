@@ -84,7 +84,7 @@
         }
     }
 
-    .events {
+    .entries {
         display: flex;
         align-items: center;
         flex-direction: column;
@@ -121,7 +121,7 @@
                 cursor: pointer;
             }
 
-            >.attributes {
+            > .attributes {
                 display: flex;
                 flex-direction: column;
                 padding: 6px 10px;
@@ -155,8 +155,9 @@
                         display: flex;
                         border-radius: 0;
 
-                        >* {
+                        > * {
                             border-radius: 0;
+                            margin: 0 10px;
                         }
 
                         .type,
@@ -180,7 +181,7 @@
             }
         }
 
-        .hidden {
+        .event.hidden {
             >.attributes {
                 visibility: hidden;
                 max-height: 0;
@@ -189,5 +190,7 @@
                 padding: 0 10px;
             }
         }
+
+
     }
 }

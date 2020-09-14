@@ -48,7 +48,7 @@ export default class SocketDocPath extends Component {
                     </div>
                     <hr />
                     <div className="errors">
-                        <h4>OnError</h4>
+                        <h4>On Error</h4>
                         {this.state.onError}
                     </div>
                 </div>
