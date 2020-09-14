@@ -46,8 +46,6 @@ export default class tauntWindow extends Component {
         });
 
         socket.socket.on('messageReceived', (m) => {
-            console.log(m, socket);
-
             RensAlert.popup({ 
                 title: `Message from ${socket.opponent}`,
                 text: m.message,
