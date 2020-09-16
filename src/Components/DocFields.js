@@ -15,8 +15,6 @@ export default class DocFields extends Component {
         const data = this.props.fields;
         const fields = [];
 
-        console.log(data);
-
         data.forEach((d, i) => {
             fields.push(<DocField key={i} type={d.type} name={d.name} desc={d.description}/>)
         });
