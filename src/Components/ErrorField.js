@@ -15,8 +15,7 @@ export default class ErrorField extends Component {
         this.props.fields.forEach((error, i) => {
             errors.push(
                 <div key={i} className="error">
-                    <h4>{error.responseCode}</h4>
-                    <h4>{error.description}</h4>
+                    <h4>{error.responseCode} - {error.description}</h4>
                     <DocFields fields={error.fields}/>
                 </div>
             )
@@ -26,8 +25,7 @@ export default class ErrorField extends Component {
 
     render() {
         return (
-            <div>
-
+            <div className="fields">
                 {this.state.errors}
             </div>
         )

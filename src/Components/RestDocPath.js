@@ -9,10 +9,19 @@ export default class RestDocPath extends Component {
         autobind(this);
     }
 
+    expand(e) {
+        document.querySelectorAll('.path').forEach(ele => {
+            if (ele !== e.currentTarget.parentElement) {
+                ele.classList.add('hidden');
+            }
+        });
+        e.currentTarget.parentElement.classList.toggle('hidden');
+    }
+
     render() {
         return (
-            <div>
-                <span className="path">{this.props.doc.path}</span>
+            <div className="path hidden">
+                <span className="route" onClick={(e) => this.expand(e)}>{this.props.doc.path}</span>
 
                 <div className="attributes">
                     {this.props.doc.pathVariables.fields.length > 0 ? (
@@ -29,7 +38,7 @@ export default class RestDocPath extends Component {
                         </div>
                     ) : ''}
 
-                    {this.props.doc.body.fields.length > 0 ? (
+                    {this.props.doc.output.fields.length > 0 ? (
                         <div className="outputs">
                             <h4>Returns</h4>
                             <DocFields fields={this.props.doc.output.fields} />
@@ -37,7 +46,7 @@ export default class RestDocPath extends Component {
                     ) : ''}
 
                     {this.props.doc.onError.length > 0 ? (
-                        <div className="inputs">
+                        <div className="errors">
                             <h4>On Error</h4>
                             <ErrorField fields={this.props.doc.onError} />
                         </div>

@@ -20,13 +20,20 @@ export default class RestDocBasePath extends Component {
         this.setState({paths})
     }
 
+    expand(e) {
+        document.querySelectorAll('.base-path').forEach(ele => {
+            if (ele !== e.currentTarget.parentElement) {
+                ele.classList.add('hidden');
+            }
+        });
+        e.currentTarget.parentElement.classList.toggle('hidden');
+    }
+
     render() {
         return (
-            <div>
-                <span className="base-path">{this.props.doc.basePath}</span>
-                <div className="paths">
-                    {this.state.paths}
-                </div>
+            <div className="base-path hidden">
+                <h3 className="base-route" onClick={(e) => this.expand(e)}>{this.props.doc.basePath}</h3>
+                {this.state.paths}
             </div>
         )
     }
