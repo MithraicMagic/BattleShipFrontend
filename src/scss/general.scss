@@ -26,7 +26,7 @@ body {
         font-size: 60px;
     }
 
-    input[type=text], input[type=number] {
+    input[type=text], input[type=number], input[type=password], input[type=email] {
         box-sizing: border-box;
         padding: 10px;
         border: 5px solid transparent;
@@ -49,6 +49,11 @@ body {
 
         &:hover {
             background: darken($red-crayola, 10);
+        }
+
+        &:disabled {
+            background: gray;
+            cursor: default;
         }
     }
 

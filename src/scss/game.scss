@@ -88,11 +88,6 @@
 
         button {
             margin: 0 10px;
-
-            &:disabled {
-                background: gray;
-                cursor: default;
-            }
         }
     }
 }
