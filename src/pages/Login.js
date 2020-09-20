@@ -46,6 +46,9 @@ export default class Login extends Component {
 
         fetch(process.env.REACT_APP_API_URL + '/auth/login', {
             method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
             body: JSON.stringify({ email, password })
         })
             .then(res => {
@@ -85,6 +88,9 @@ export default class Login extends Component {
 
         fetch(process.env.REACT_APP_API_URL + '/auth/register', {
             method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
             body: JSON.stringify({ username, email, password })
         })
             .then(res => {
