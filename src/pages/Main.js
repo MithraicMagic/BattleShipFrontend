@@ -157,7 +157,7 @@ class Main extends Component {
                 return (
                     <div>
                         {joinCode ? <h2>Enter a username to join {this.state.otherName}'s lobby!</h2> : <h2>Enter your desired username!</h2>}
-                        <input type="text" id="username" autoComplete="off" data-lpignore="true" onKeyDown={(k) => k.key === 'Enter' ? this.submitUsername() : null}></input>
+                        <input type="text" id="username" autoComplete="off" data-lpignore="true" minLength="4" maxLength="20" size="20" onKeyDown={(k) => k.key === 'Enter' ? this.submitUsername() : null}></input>
                         <button onClick={this.submitUsername}>Submit</button>
                         <div className="divider">
                             <hr />
