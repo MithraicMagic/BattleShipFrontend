@@ -10,18 +10,18 @@ class Main extends Component {
     constructor(props) {
         super(props);
         autobind(this);
-    
+
         this.state = {};
         this.copyPopupTimeout = null;
     }
 
     componentDidMount() {
-        socket.onStateSwitch = () => { 
+        socket.onStateSwitch = () => {
             if (socket.state === "Settings") {
                 this.props.history.push('/settings');
                 return;
             }
-            this.forceUpdate(); 
+            this.forceUpdate();
         }
 
         socket.emit('getNameData', { uid: socket.uid });
@@ -31,7 +31,7 @@ class Main extends Component {
                 username: data.me
             });
         });
-        
+
         const joinCode = new URL(window.location.href).searchParams.get('code');
         if (joinCode != null) {
             socket.emit('getLobbyInfo', joinCode)
@@ -72,13 +72,19 @@ class Main extends Component {
         });
 
         socket.on('opponentLeft', () => {
-            rensalert.popup({ 
-                title: "Oh no!", 
-                text: "Your opponent has disconnected 😭", 
+            rensalert.popup({
+                title: "Oh no!",
+                text: "Your opponent has disconnected 😭",
             });
         });
 
         socket.on('setupStarted', () => this.props.history.push('/setup'));
+
+        setTimeout(() => {
+            if (sessionStorage.getItem('jwtoken') && !this.state.playerCode) {
+                this.getUsernameFromToken();
+            }
+        }, 1000);
     }
 
     componentWillUnmount() {
@@ -86,19 +92,34 @@ class Main extends Component {
         if (this.copyPopupTimeout) clearTimeout(this.copyPopupTimeout);
     }
 
+    getUsernameFromToken() {
+        const token = sessionStorage.getItem('jwtoken');
+
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''))
+
+        const username = JSON.parse(jsonPayload).sub;
+        if (username) {
+            socket.emit('inputUsername', username);
+        }
+    }
+
     submitUsername() {
         const name = document.getElementById('username').value.trimLeft().trimRight();
         if (!name || name.length < 4) {
-            rensalert.popup({ 
-                title: 'Oopsie!', 
-                text: 'Please enter a username that is longer than 4 characters', 
+            rensalert.popup({
+                title: 'Oopsie!',
+                text: 'Please enter a username that is longer than 4 characters',
             });
             return;
         }
         if (name.length > 20) {
-            rensalert.popup({ 
+            rensalert.popup({
                 title: 'Oopsie!',
-                text: 'Please enter a username that is shorter than 20 characters', 
+                text: 'Please enter a username that is shorter than 20 characters',
             });
             return;
         }

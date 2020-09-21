@@ -14,7 +14,7 @@ export default class Login extends Component {
         e.preventDefault();
         if (e.target.classList.contains('login-form')) {
             this.toggleButton(true);
-            this.login();
+            this.signIn();
             this.toggleButton(true);
         } else {
             this.toggleButton(false);
@@ -26,7 +26,7 @@ export default class Login extends Component {
     toggleButton(isLogin) {
         if (isLogin) {
             const button = document.getElementById('log-btn');
-            button.innerText = button.disabled ? 'Login' : 'Logging In...';
+            button.innerText = button.disabled ? 'Sign In' : 'Signing In...';
             button.disabled = !button.disabled;
         } else {
             const button = document.getElementById('reg-btn');
@@ -35,7 +35,7 @@ export default class Login extends Component {
         }
     }
 
-    login() {
+    signIn() {
         const email = document.getElementById('log-email').value;
         const password = document.getElementById('log-pw').value;
 
@@ -51,11 +51,19 @@ export default class Login extends Component {
             },
             body: JSON.stringify({ email, password })
         })
-            .then(res => {
+            .then(async res => {
                 if (res.ok) {
+                    console.log(res.status);
                     rensAlert.popup({ title: 'Yay!', text: 'Login successful!' });
-                    sessionStorage.setItem('jwtoken', res.json().jwt)
-                    this.props.history.push('/')
+                    const body = await res.json();
+                    sessionStorage.setItem('jwtoken', body.jwt);
+                    this.props.history.push('/');
+                } else if (res.status === 403) {
+                    rensAlert.popup({ title: 'Hmmm..', text: 'The credentials you have entered are not correct, try again!' });
+                } else if (res.status === 422) {
+                    rensAlert.popup({ title: 'Oh no!', text: 'The input you have entered is invalid, try again!' });
+                } else if (res.status === 500) {
+                    rensAlert.popup({ title: 'Oops!', text: 'Something went wrong on the server side, try again later!' });
                 }
             });
     }
@@ -97,6 +105,10 @@ export default class Login extends Component {
                 if (res.ok) {
                     rensAlert.popup({ title: 'Yay!', text: 'You successfully signed up and can now login with your new account!' });
                     document.querySelector('.register-form').reset();
+                } else if (res.status === 422) {
+                    rensAlert.popup({ title: 'Oh no!', text: 'There is already an account with the same credentials!' });
+                } else if (res.status === 500) {
+                    rensAlert.popup({ title: 'Oops!', text: 'Something went wrong on the server side, try again later!' });
                 }
             });
     }
