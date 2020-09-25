@@ -18,6 +18,10 @@ body {
     font-size: 20px;
     color: white;
 
+    .colorful {
+        color: $vivid-sky-blue;
+    }
+
     button {
         cursor: pointer;
     }

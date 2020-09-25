@@ -3,7 +3,7 @@ import socket from '../socket';
 
 import '../scss/main.scss';
 import autobind from 'class-autobind';
-import rensalert from '../rensAlert/rensAlert';
+import rensAlert from '../rensAlert/rensAlert';
 import { withRouter } from 'react-router-dom';
 
 class Main extends Component {
@@ -72,7 +72,7 @@ class Main extends Component {
         });
 
         socket.on('opponentLeft', () => {
-            rensalert.popup({
+            rensAlert.popup({
                 title: "Oh no!",
                 text: "Your opponent has disconnected 😭",
             });
@@ -80,9 +80,13 @@ class Main extends Component {
 
         socket.on('setupStarted', () => this.props.history.push('/setup'));
 
+        this.getScoreOfUser();
+
         setTimeout(() => {
-            if (sessionStorage.getItem('jwtoken') && !this.state.playerCode) {
-                this.getUsernameFromToken();
+            if (sessionStorage.getItem('jwtoken')) {
+                if (!this.state.playerCode) {
+                    this.getUsernameFromToken();
+                }
             }
         }, 1000);
     }
@@ -107,17 +111,38 @@ class Main extends Component {
         }
     }
 
+    getScoreOfUser() {
+        if (!sessionStorage.getItem('jwtoken')) return;
+        
+        fetch(process.env.REACT_APP_API_URL + '/user/wins', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + sessionStorage.getItem('jwtoken')
+            }
+        })
+        .then(async res => {
+            if (res.ok) {
+                const wins = await res.json();
+                this.setState({spWins: wins.sp, mpWins: wins.mp});
+            } else if (res.status === 404) {
+                rensAlert.popup({ title: 'Oh no!', text: 'The user connected to this token could not be found :(' });
+            } else if (res.status === 500) {
+                rensAlert.popup({ title: 'Oops!', text: 'Something went wrong on the server side, try again later!' });
+            }
+        });
+    }
+
     submitUsername() {
         const name = document.getElementById('username').value.trimLeft().trimRight();
         if (!name || name.length < 4) {
-            rensalert.popup({
+            rensAlert.popup({
                 title: 'Oopsie!',
                 text: 'Please enter a username that is longer than 4 characters',
             });
             return;
         }
         if (name.length > 20) {
-            rensalert.popup({
+            rensAlert.popup({
                 title: 'Oopsie!',
                 text: 'Please enter a username that is shorter than 20 characters',
             });
@@ -171,7 +196,11 @@ class Main extends Component {
                 return (
                     <Fragment>
                         <div className="top">
-                            <h1>Hey, {this.state.username}!</h1>
+                            <div>
+                                <h1>Hey, {this.state.username}!</h1>
+                                {this.state.spWins !== null && this.state.spWins !== undefined ? 
+                                <h3>You have won <span className="colorful">{this.state.spWins}</span> singleplayer and <span className="colorful">{this.state.mpWins}</span> multiplayer games so far</h3> : ''}
+                            </div>
                             <h2>
                                 Your code is: <span className="code" onClick={this.onCodeClick}>{this.state.playerCode}</span>
                                 <div className="copyPopup"><p>Code copied to clipboard</p></div>

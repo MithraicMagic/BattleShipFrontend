@@ -36,6 +36,13 @@ export default class Game extends Component {
             if (socket.state === "Setup") {
                 this.props.history.push('/setup');
             }
+            if (socket.state === "GameWon" && sessionStorage.getItem('jwtoken')) {
+                socket.emit('loggedInUserWon', {
+                    jwt: 'Bearer ' + sessionStorage.getItem('jwtoken'),
+                    lobbyId: this.state.lobbyId,
+                    uid: socket.uid
+                });
+            }
             this.forceUpdate();
         }
 
@@ -45,7 +52,8 @@ export default class Game extends Component {
                 lobbyId: data.lobbyId,
                 username: data.me,
                 otherUsername: data.opponent,
-                leader: data.leader
+                leader: data.leader,
+                boatsLeft: data.boatsLeft
             });
             this.placeBoats(data.boatData);
             this.setTiles(data.hitData, data.missData);
@@ -56,9 +64,10 @@ export default class Game extends Component {
                 this.registerShot(true, true, data.pos);
                 if (data.destroyedShip) {
                     rensAlert.popup({title: 'WOOHOO!', text: 'You hit and destroyed a ship! 🔥🚢🔥' });
+                    this.setState({boatsLeft: data.boatsLeft});
                     return;
                 }
-                rensAlert.popup({title: 'Yay!', text:'You hit a ship! 🔥🚢' })
+                rensAlert.popup({title: 'Yay!', text:'You hit a ship! 🔥🚢' });
             } else {
                 this.registerShot(true, false, data.pos);
                 rensAlert.popup({title: 'Aww...', text:'You missed 😢' });              
@@ -146,38 +155,38 @@ export default class Game extends Component {
         switch (socket.state) {
             case "YourTurn":
                 return (
-                    <div className="info">
+                    <Fragment>
                         <h1>It's your turn!</h1>
                         <h2>Click on a tile on the opponent grid to fire</h2>
-                    </div>
+                    </Fragment>
                 )
             case "OpponentTurn":
                 return (
-                    <div className="info">
+                    <Fragment>
                         <h1>It's the opponent's turn</h1>
                         <h2>Waiting for opponent to shoot one of your tiles...</h2>
-                    </div>
+                    </Fragment>
                 )
             case "GameWon":
                 return(
-                    <div className="info">
+                    <Fragment>
                         <h1>You won the game!</h1>
                         <h2>You destroyed all of the opponent's ships!</h2>
-                    </div>
+                    </Fragment>
                 )
             case "GameLost":
                 return(
-                    <div className="info">
+                    <Fragment>
                         <h1>You lost <span role="img" aria-label="ULTRASAD!">😭</span></h1>
                         <h2>Your opponent destroyed all of your ships...</h2>
-                    </div>
+                    </Fragment>
                 )
             case "Rematch":
                 return (
-                    <div className="info">
+                    <Fragment>
                         <h1>Rematching may commence shortly! ⚔</h1>
                         <h2>Waiting for the opponent to decide...</h2>
-                    </div>
+                    </Fragment>
                 )
             default:
                 return <h1>Oopsie whoopsie, unknown state <span role="img" aria-label="SAD!">😔</span></h1>;
@@ -218,7 +227,10 @@ export default class Game extends Component {
         return (
             <div className="game-page">
                 <button onClick={() => socket.submitLeave(this.state.lobbyId)}>Leave</button>
-                {this.getCurrentView()}
+                <div className="info">
+                    {this.getCurrentView()}
+                    {this.state.boatsLeft ? <h3>The opponent has <span className="colorful">{this.state.boatsLeft}</span> boats left!</h3> : ''}
+                </div>
                 {this.showGrid()}
                 <div className="bottom">
                     {this.getBottom()}
