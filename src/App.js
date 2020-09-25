@@ -8,6 +8,7 @@ import Main from './pages/Main';
 import Setup from './pages/Setup';
 import Game from './pages/Game';
 import Settings from './pages/SingleplayerSettings';
+import BigError from './pages/BigError';
 import TauntWindow from './Components/tauntWindow';
 import { DEFAULT_STYLE } from './rensAlertStyles';
 import Documentation from './pages/Documentation';
@@ -25,12 +26,13 @@ export default class App extends Component {
         <RensAlertContainer ref={RensAlert.container}/>
         <Router>
           <Switch>
-            <Route path={'/game'} component={Game} />
-            <Route path={'/setup'} component={Setup} />
-            <Route path={'/settings'} component={Settings} />
-            <Route path={'/login'} component={Login} />
-            <Route path={'/documentation'} component={Documentation} />
-            <Route path={'/'} component={Main} />
+            <Route exact path={'/game'} component={Game} />
+            <Route exact path={'/setup'} component={Setup} />
+            <Route exact path={'/settings'} component={Settings} />
+            <Route exact path={'/login'} component={Login} />
+            <Route exact path={'/documentation'} component={Documentation} />
+            <Route exact path={'/'} component={Main} />
+            <Route path={'*'} component={BigError} />
           </Switch>
         </Router>
         <TauntWindow/>
