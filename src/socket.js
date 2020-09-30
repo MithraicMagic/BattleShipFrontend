@@ -1,8 +1,8 @@
 import io from 'socket.io-client';
 import RensAlert from './rensAlert/rensAlert';
-import { NON_TIMED } from './rensAlertStyles';
+import { DEFAULT_STYLE, NON_TIMED } from './rensAlertStyles';
 
-import Cat from './sounds/cat.mp3';
+import MusicPlayer from './musicPlayer';
 
 class Socket {
     constructor() {
@@ -15,6 +15,8 @@ class Socket {
 
         this.username = "";
         this.opponent = "";
+
+        this.musicPlayer = new MusicPlayer();
 
         this.listeners = [];
         this.init();
@@ -53,10 +55,30 @@ class Socket {
 
         this.socket.emit('lastUid', { uid: this.uid });
 
-        this.socket.on('playMinecraft', () => {
-            const cat = new Audio(Cat);
-            cat.volume = 0.3;
-            cat.play();
+        this.socket.on('command', (data) => {
+            if (process.env.REACT_APP_CATCH_COMMAND_EVENTS === 'true') {
+                console.log(`[Command Received: ${data.commandName} with sender: ${data.sender} and params: ${data.params.toString()}]`)
+            }
+
+            var success = false;
+
+            if (data.commandName === 'play') success = this.musicPlayer.play(data.params);
+            else if (data.commandName === 'volume') success = this.musicPlayer.volume(data.params);
+
+            if (success) {
+                if (data.sender !== this.username) {
+                    RensAlert.popup({
+                        title: "Wow",
+                        text: `${this.opponent} used the following command: ${data.commandName} ${data.params.toString().replace(',', ' ')}`
+                    }, DEFAULT_STYLE);
+                }
+            }
+            else {
+                RensAlert.popup({
+                    title: "Oops",
+                    text: "Failed to parse your command",
+                }, DEFAULT_STYLE);
+            }
         });
     }
 
