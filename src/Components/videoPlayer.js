@@ -8,7 +8,7 @@ export default class videoPlayer extends Component {
     }
 
     control(params) {
-        if (params === 'stop') {
+        if (params[0] === 'stop') {
             this.setState({video: null});
         } else {
             this.setState({

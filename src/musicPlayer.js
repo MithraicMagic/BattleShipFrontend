@@ -60,8 +60,6 @@ export default class MusicPlayer {
     }
 
     volume(params) {
-        console.log(params);
-
         if (params.length !== 1) return false;
         const vol = params[0];
 

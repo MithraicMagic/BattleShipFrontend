@@ -53,7 +53,6 @@ export default class Login extends Component {
         })
             .then(async res => {
                 if (res.ok) {
-                    console.log(res.status);
                     rensAlert.popup({ title: 'Yay!', text: 'Login successful!' });
                     const body = await res.json();
                     sessionStorage.setItem('jwtoken', body.jwt);
