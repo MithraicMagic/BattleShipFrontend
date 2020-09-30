@@ -73,12 +73,14 @@ class Socket {
                         text: `${this.opponent} used the following command: ${data.commandName} ${data.params.toString().replace(',', ' ')}`
                     }, DEFAULT_STYLE);
                 }
-            }
+            } 
             else {
-                RensAlert.popup({
-                    title: "Oops",
-                    text: "Failed to parse your command",
-                }, DEFAULT_STYLE);
+                if (data.sender === this.username) {
+                    RensAlert.popup({
+                        title: "Oops",
+                        text: "Failed to parse your command",
+                    }, DEFAULT_STYLE);
+                }
             }
         });
     }
