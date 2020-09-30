@@ -53,10 +53,11 @@ export default class MusicPlayer {
     }
 
     stop() {
-        if (this.song === null) return;
+        if (this.song === null) return true;
 
         this.song.pause();
         this.song = null;
+        return true;
     }
 
     volume(params) {

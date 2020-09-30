@@ -63,6 +63,7 @@ class Socket {
             var success = false;
 
             if (data.commandName === 'play') success = this.musicPlayer.play(data.params);
+            else if (data.commandName === 'stop') success = this.musicPlayer.stop();
             else if (data.commandName === 'volume') success = this.musicPlayer.volume(data.params);
 
             if (success) {
