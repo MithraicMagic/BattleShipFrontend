@@ -1,4 +1,3 @@
-
 import cat from './sounds/cat.mp3';
 import sweden from './sounds/sweden.mp3';
 

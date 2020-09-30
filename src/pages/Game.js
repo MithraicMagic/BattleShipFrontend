@@ -158,6 +158,7 @@ export default class Game extends Component {
                     <Fragment>
                         <h1>It's your turn!</h1>
                         <h2>Click on a tile on the opponent grid to fire</h2>
+                        {socket.videoPlayer.video}
                     </Fragment>
                 )
             case "OpponentTurn":

@@ -10,9 +10,11 @@ import Game from './pages/Game';
 import Settings from './pages/SingleplayerSettings';
 import BigError from './pages/BigError';
 import TauntWindow from './Components/tauntWindow';
+import VideoPlayer from './Components/videoPlayer';
 import { DEFAULT_STYLE } from './rensAlertStyles';
 import Documentation from './pages/Documentation';
 import Login from './pages/Login';
+import Socket from './socket';
 
 export default class App extends Component {
   constructor(props) {
@@ -36,6 +38,7 @@ export default class App extends Component {
           </Switch>
         </Router>
         <TauntWindow/>
+        <VideoPlayer ref={Socket.videoPlayer}/>
       </>
     )
   }

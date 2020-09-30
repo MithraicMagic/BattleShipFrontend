@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
 import RensAlert from './rensAlert/rensAlert';
 import { DEFAULT_STYLE, NON_TIMED } from './rensAlertStyles';
+import React from 'react';
 
 import MusicPlayer from './musicPlayer';
 
@@ -17,6 +18,7 @@ class Socket {
         this.opponent = "";
 
         this.musicPlayer = new MusicPlayer();
+        this.videoPlayer = React.createRef();
 
         this.listeners = [];
         this.init();
@@ -62,9 +64,23 @@ class Socket {
 
             var success = false;
 
-            if (data.commandName === 'play') success = this.musicPlayer.play(data.params);
-            else if (data.commandName === 'stop') success = this.musicPlayer.stop();
-            else if (data.commandName === 'volume') success = this.musicPlayer.volume(data.params);
+            switch (data.commandName) {
+                case 'play':
+                    success = this.musicPlayer.play(data.params)
+                    break;
+                case 'stop':
+                    success = this.musicPlayer.stop();
+                    break;
+                case 'volume':
+                    success = this.musicPlayer.volume(data.params);
+                    break;
+                case 'youtube':
+                    success = this.videoPlayer.current.play(data.params);
+                    break;
+                default:
+                    success = false;
+                    break;
+            }
 
             if (success) {
                 if (data.sender !== this.username) {
