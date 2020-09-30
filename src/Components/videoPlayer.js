@@ -7,10 +7,15 @@ export default class videoPlayer extends Component {
         this.state = { video: null }
     }
 
-    play(link) {
-        this.setState({
-            video: <iframe title="YouTube Player" src={link} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-        });
+    control(params) {
+        if (params === 'stop') {
+            this.setState({video: null});
+        } else {
+            this.setState({
+                video: <iframe title="YouTube Player" src={params} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+            });
+        }
+
         return true;
     }
 

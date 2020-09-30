@@ -75,7 +75,7 @@ class Socket {
                     success = this.musicPlayer.volume(data.params);
                     break;
                 case 'youtube':
-                    success = this.videoPlayer.current.play(data.params);
+                    success = this.videoPlayer.current.control(data.params);
                     break;
                 default:
                     success = false;
