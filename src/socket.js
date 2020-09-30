@@ -50,6 +50,10 @@ class Socket {
         });
 
         this.socket.emit('lastUid', { uid: this.uid });
+
+        this.socket.on('playMinecraft', () => {
+            new Audio('./sounds/').play();
+        });
     }
 
     setUid(uid) {
