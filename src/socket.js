@@ -2,6 +2,8 @@ import io from 'socket.io-client';
 import RensAlert from './rensAlert/rensAlert';
 import { NON_TIMED } from './rensAlertStyles';
 
+import Cat from './sounds/cat.mp3';
+
 class Socket {
     constructor() {
         this.socket = io(process.env.REACT_APP_SOCKET_URL, { path: '/sockets' });
@@ -52,7 +54,9 @@ class Socket {
         this.socket.emit('lastUid', { uid: this.uid });
 
         this.socket.on('playMinecraft', () => {
-            new Audio('./sounds/').play();
+            const cat = new Audio(Cat);
+            cat.volume = 0.3;
+            cat.play();
         });
     }
 
