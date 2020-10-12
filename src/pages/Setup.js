@@ -262,6 +262,7 @@ class Setup extends Component {
         //If the R button is pressed, rotate currently editing boat
         if (k.key === 'r' && this.state.currentBoat) {
             this.setState({ currentBoat: { ...this.state.currentBoat, orientation: this.state.currentBoat.orientation === 0 ? 1 : 0 } });
+            document.dispatchEvent(new Event("mousemove"));
         }
     }
 
