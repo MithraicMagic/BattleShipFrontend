@@ -9,6 +9,7 @@ import autobind from 'class-autobind';
 import { withRouter } from 'react-router-dom';
 
 import { NON_TIMED } from '../rensAlertStyles';
+import HelpPopup from '../Components/HelpPopup';
 
 class Setup extends Component {
     constructor(props) {
@@ -22,6 +23,8 @@ class Setup extends Component {
             opponentReady: false
         };
         socket.state = 'Setup';
+
+        this.tile = {xCell: 0, yCell: 0};
 
         autobind(this);
     }
@@ -166,32 +169,11 @@ class Setup extends Component {
                     this.setState({ currentBoat: { ...this.state.currentBoat, onBoard: true } });
                 }
 
-                const boat = this.state.currentBoat;
-                const boatData = BOATDATA.get(boat.type);
-
                 //Calculate on which tile the mouse is currently hovering
-                const tile = this.calculateTile(m);
-                const startX = boat.orientation === 1 ? tile.xCell : tile.xCell - Math.floor((boatData.size - .01) / 2);
-                const startY = boat.orientation === 0 ? tile.yCell : tile.yCell - Math.floor((boatData.size - .01) / 2);
+                this.tile = this.calculateTile(m);
 
-                //Remove boat from other tiles on the grid
-                document.querySelectorAll('.grid-cell').forEach(cell => {
-                    if (cell.classList.contains(boatData.class)) {
-                        cell.classList.remove(boatData.class, 'active');
-                        if (cell.getAttribute('boattype') === boatData.class) cell.removeAttribute('boattype');
-                    }
-                });
-
-                //Add the boat to tiles on the grid
-                for (let i = 0; i < boatData.size; i++) {
-                    const cell = document.getElementById('x:' + (boat.orientation === 1 ? startX : startX + i) + '-y:' + (boat.orientation === 0 ? startY : startY + i));
-
-                    //Check if there is already another boat active on this tile
-                    if (cell && !cell.classList.contains('active')) {
-                        cell.classList.add(boatData.class, 'active');
-                        cell.setAttribute('boattype', boatData.class);
-                    }
-                }
+                //Place boat
+                this.placeBoat()
             } else {
                 //If the boat was on board, now it is not anymore
                 if (this.state.currentBoat.onBoard) {
@@ -206,6 +188,33 @@ class Setup extends Component {
                         if (cell.getAttribute('boattype') === boatData.class) cell.removeAttribute('boattype');
                     }
                 });
+            }
+        }
+    }
+
+    placeBoat() {
+        const boat = this.state.currentBoat;
+        const boatData = BOATDATA.get(boat.type);
+
+        const startX = boat.orientation === 1 ? this.tile.xCell : this.tile.xCell - Math.floor((boatData.size - .01) / 2);
+        const startY = boat.orientation === 0 ? this.tile.yCell : this.tile.yCell - Math.floor((boatData.size - .01) / 2);
+
+        //Remove boat from other tiles on the grid
+        document.querySelectorAll('.grid-cell').forEach(cell => {
+            if (cell.classList.contains(boatData.class)) {
+                cell.classList.remove(boatData.class, 'active');
+                if (cell.getAttribute('boattype') === boatData.class) cell.removeAttribute('boattype');
+            }
+        });
+
+        //Add the boat to tiles on the grid
+        for (let i = 0; i < boatData.size; i++) {
+            const cell = document.getElementById('x:' + (boat.orientation === 1 ? startX : startX + i) + '-y:' + (boat.orientation === 0 ? startY : startY + i));
+
+            //Check if there is already another boat active on this tile
+            if (cell && !cell.classList.contains('active')) {
+                cell.classList.add(boatData.class, 'active');
+                cell.setAttribute('boattype', boatData.class);
             }
         }
     }
@@ -262,7 +271,7 @@ class Setup extends Component {
         //If the R button is pressed, rotate currently editing boat
         if (k.key === 'r' && this.state.currentBoat) {
             this.setState({ currentBoat: { ...this.state.currentBoat, orientation: this.state.currentBoat.orientation === 0 ? 1 : 0 } });
-            document.dispatchEvent(new MouseEvent("mousemove"));
+            this.placeBoat();
         }
     }
 
@@ -342,7 +351,10 @@ class Setup extends Component {
                         }}>
                             <Grid id="grid" />
                             <div className="dock">
-                                <button onClick={this.clearBoats}>Clear Grid</button>
+                                <div className="flex-button-container">
+                                    <HelpPopup/>
+                                    <button onClick={this.clearBoats}>Clear Grid</button>
+                                </div>
                                 <div className="boats">
                                     <Boat id="carrier" boatType={BOATTYPE.AIRCRAFT_CARRIER}></Boat>
                                     <Boat id="battleship" boatType={BOATTYPE.BATTLESHIP}></Boat>
