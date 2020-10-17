@@ -1,0 +1,138 @@
+@keyframes wave-one {
+    0%   {bottom: -190px;}
+    10%  {bottom: -200px;}
+    20%  {bottom: -210px;}
+    30%  {bottom: -220px;}
+    40%  {bottom: -230px;}
+    50%  {bottom: -220px;}
+    60%  {bottom: -210px;}
+    70%  {bottom: -200px;}
+    80%  {bottom: -190px;}
+    90%  {bottom: -180px;}
+    100% {bottom: -190px;}
+}
+
+@keyframes wave-two {
+    0%   {bottom: -190px;}
+    10%  {bottom: -180px;}
+    20%  {bottom: -170px;}
+    30%  {bottom: -160px;}
+    40%  {bottom: -165px;}
+    50%  {bottom: -170px;}
+    60%  {bottom: -180px;}
+    70%  {bottom: -190px;}
+    80%  {bottom: -200px;}
+    90%  {bottom: -195px;}
+    100% {bottom: -190px;}
+}
+
+@keyframes wave-three {
+    0%   {bottom: -190px;}
+    10%  {bottom: -180px;}
+    20%  {bottom: -190px;}
+    30%  {bottom: -200px;}
+    40%  {bottom: -205px;}
+    50%  {bottom: -210px;}
+    60%  {bottom: -220px;}
+    70%  {bottom: -210px;}
+    80%  {bottom: -200px;}
+    90%  {bottom: -197px;}
+    100% {bottom: -190px;}
+}
+
+@keyframes boat {
+    0%   {bottom: 50px;}
+    10%  {bottom: 60px;}
+    20%  {bottom: 70px;}
+    30%  {bottom: 80px;}
+    40%  {bottom: 70px;}
+    50%  {bottom: 60px;}
+    60%  {bottom: 70px;}
+    70%  {bottom: 60px;}
+    80%  {bottom: 50px;}
+    90%  {bottom: 40px;}
+    100% {bottom: 50px;}
+}
+
+.bs-title {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 950px;
+    height: 400px;
+    overflow: hidden;
+
+    .title {
+        font-size: 100px;
+    }
+
+    .wave {
+        position: absolute;
+        width: 950px;
+        height: 100%;
+
+        animation-duration: 6s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+
+        svg {
+            height: 100%;
+            width: 100%;
+        }
+    
+        path {
+            stroke: none;
+        }
+
+        &.one {
+            animation-name: wave-one;
+    
+            path {
+                fill: rgb(57, 97, 182);
+            }
+    
+        }
+    
+        &.two {
+            bottom: -190px;
+    
+            animation-name: wave-two;
+            animation-delay: 1s;
+    
+            path {
+                fill: rgb(49, 83, 157);
+            }
+        }
+    
+        &.three {
+            bottom: -190px;
+    
+            animation-name: wave-three;
+            animation-delay: .6s;
+    
+            path {
+                fill: rgb(74, 116, 206);
+            }
+        }
+    }
+
+    .boat {
+        position: absolute;
+        width: 300px;
+        height: 150px;
+
+        bottom: 50px;
+        right: 25px;
+
+        animation-name: boat;
+        animation-duration: 6s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+
+        path {
+            fill: rgb(60, 60, 60);
+        }
+    }
+}

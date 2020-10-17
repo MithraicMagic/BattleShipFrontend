@@ -5,6 +5,7 @@ import '../scss/main.scss';
 import autobind from 'class-autobind';
 import rensAlert from '../rensAlert/rensAlert';
 import { withRouter } from 'react-router-dom';
+import BSTitle from '../Components/BSTitle';
 
 class Main extends Component {
     constructor(props) {
@@ -180,7 +181,9 @@ class Main extends Component {
             case "EnterName":
                 const joinCode = new URL(window.location.href).searchParams.get('code');
                 return (
-                    <div>
+                    <Fragment>
+                        <BSTitle/>
+                        <div>
                         {joinCode ? <h2>Enter a username to join {this.state.otherName}'s lobby!</h2> : <h2>Enter your desired username!</h2>}
                         <input type="text" id="username" autoComplete="off" data-lpignore="true" minLength="4" maxLength="20" size="20" onKeyDown={(k) => k.key === 'Enter' ? this.submitUsername() : null}></input>
                         <button onClick={this.submitUsername}>Submit</button>
@@ -191,6 +194,7 @@ class Main extends Component {
                         <button onClick={() => this.props.history.push('/login')}>Sign In</button>
                         <a href={'/documentation'}>API Documentation</a>
                     </div>
+                    </Fragment>
                 );
             case "Available":
                 return (
