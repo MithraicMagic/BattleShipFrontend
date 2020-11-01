@@ -4,7 +4,7 @@ import '../scss/bsTitle.scss';
 export default class BSTitle extends Component {
     render() {
         return (
-            <div class="bs-title">
+            <div className="bs-title">
                 <h2>Welcome to</h2>
                 <h1 className="title">BattleShips</h1>
                 <svg className="wave one" viewBox="0 0 500 150" preserveAspectRatio="none">

@@ -32,10 +32,12 @@ class Socket {
                 console.log(`[ErrorEvent Received: ${data.event} ${data.reason}]`);
             }
 
-            RensAlert.popup({
-                title: 'Oopsie!',
-                text: data.reason,
-            });
+            if (data.event !== 'getNameData') {
+                RensAlert.popup({
+                    title: 'Oopsie!',
+                    text: data.reason,
+                });
+            }
         });
 
         this.socket.on('opponentReconnected', () => {
